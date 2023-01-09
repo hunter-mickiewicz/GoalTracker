@@ -106,8 +106,25 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext ctx) {
-    return Scaffold(
-      body: Text('testing'),
+    var appState = ctx.watch<MyAppState>();
+    var goals = appState.goalList;
+    var msg = '';
+
+    if (goals.isEmpty) {
+      msg = 'No goals';
+    }
+
+    return ListView(
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.all(20),
+          child: Center(child: Text(msg)),
+        ),
+        for (var goal in goals)
+          ListTile(
+            title: Text(goal.percent.toString()),
+          ),
+      ],
     );
   }
 }
