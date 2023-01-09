@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:math';
 
 import 'package:english_words/english_words.dart';
@@ -37,7 +38,7 @@ class MyAppState extends ChangeNotifier {
   var selectedIndex = 0;
 
   void addGoal() {
-    goalList.add(GC.GoalClass(DateTime.now(), DateTime.utc(2023, 12, 31), 0));
+    goalList.add(GC.GoalClass(DateTime.now(), DateTime.utc(2023, 12, 31), 69));
     notifyListeners();
   }
 }
@@ -123,6 +124,8 @@ class _HomePageState extends State<HomePage> {
         for (var goal in goals)
           ListTile(
             title: Text(goal.percent.toString()),
+            subtitle: Text(
+                "${goal.begin!.month}/${goal.begin!.day}/${goal.begin!.year}    ${goal.end!.month}/${goal.end!.day}/${goal.end!.year}"),
           ),
       ],
     );
@@ -136,7 +139,14 @@ class ManagePage extends StatefulWidget {
 
 class _ManagePageState extends State<ManagePage> {
   @override
-  Widget build(BuildContext context) {
-    return Scaffold();
+  Widget build(BuildContext ctx) {
+    var appState = ctx.watch<MyAppState>();
+
+    return Scaffold(
+        floatingActionButton: FloatingActionButton(
+      onPressed: appState.addGoal,
+      backgroundColor: Color.fromARGB(0, 0, 0, 0),
+      child: Icon(Icons.add),
+    ));
   }
 }
