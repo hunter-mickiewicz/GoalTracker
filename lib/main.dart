@@ -1,12 +1,7 @@
-import 'dart:ffi';
-import 'dart:math';
-
-import 'package:english_words/english_words.dart';
+import 'package:percent_indicator/percent_indicator.dart' as perc;
 import 'package:flutter/material.dart';
-import 'package:namer_app/GoalClass.dart';
-import 'package:namer_app/goalClass.dart';
 import 'package:provider/provider.dart';
-import 'GoalClass.dart' as GC;
+import 'GoalClass.dart' as gc;
 
 void main() {
   runApp(MyApp());
@@ -33,12 +28,13 @@ class MyApp extends StatelessWidget {
 }
 
 class MyAppState extends ChangeNotifier {
-  var goalList = <GC.GoalClass>[];
+  var goalList = <gc.GoalClass>[];
 
   var selectedIndex = 0;
 
   void addGoal() {
-    goalList.add(GC.GoalClass(DateTime.now(), DateTime.utc(2023, 12, 31), 69));
+    goalList
+        .add(gc.GoalClass(DateTime.now(), DateTime.utc(2023, 12, 31), 0.69));
     notifyListeners();
   }
 }
@@ -122,10 +118,33 @@ class _HomePageState extends State<HomePage> {
           child: Center(child: Text(msg)),
         ),
         for (var goal in goals)
-          ListTile(
-            title: Text(goal.percent.toString()),
-            subtitle: Text(
-                "${goal.begin!.month}/${goal.begin!.day}/${goal.begin!.year}    ${goal.end!.month}/${goal.end!.day}/${goal.end!.year}"),
+          Card(
+            child: ListTile(
+              minVerticalPadding: 2,
+              tileColor: Color.fromARGB(255, 78, 167, 118),
+              title: Column(
+                children: [
+                  Text("${goal.getStringPercent()}%"),
+                  perc.LinearPercentIndicator(
+                    percent: goal.percent!.toDouble(),
+                    backgroundColor: Colors.grey,
+                    progressColor: Colors.blue,
+                  ),
+                ],
+              ),
+              subtitle: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "${goal.begin!.month}/${goal.begin!.day}/${goal.begin!.year}",
+                    ),
+                    Text(" "),
+                    Text(
+                      "${goal.end!.month}/${goal.end!.day}/${goal.end!.year}",
+                    ),
+                  ]),
+              //Text("${goal.begin!.month}/${goal.begin!.day}/${goal.begin!.year}    ${goal.end!.month}/${goal.end!.day}/${goal.end!.year}"),
+            ),
           ),
       ],
     );
