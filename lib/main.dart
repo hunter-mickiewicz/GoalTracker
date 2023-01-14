@@ -183,6 +183,7 @@ class GoalCreatorPage extends StatefulWidget {
 }
 
 class _GoalCreatorPageState extends State<GoalCreatorPage> {
+  String? goalName;
   DateTime? begin;
   String beginString = "Select Start Date";
   DateTime? end;
@@ -209,14 +210,22 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
     return Scaffold(
         body: Column(
       children: [
+        Text("Goal Name"),
+        TextField(
+          decoration: InputDecoration(
+              focusColor: Color.fromARGB(255, 100, 98, 98),
+              border: OutlineInputBorder(),
+              contentPadding: EdgeInsets.symmetric(horizontal: 20)),
+          onChanged: (text) {
+            goalName = text;
+          },
+        ),
         Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           OutlinedButton(
-            onPressed: () {
-              _beginDateSelection();
-            },
+            onPressed: _beginDateSelection,
             child: Text("Start Date"),
           ),
-          OutlinedButton(onPressed: _endDateSelection, child: Text("EndDate"))
+          OutlinedButton(onPressed: _endDateSelection, child: Text("EndDate")),
         ]),
       ],
     ));
