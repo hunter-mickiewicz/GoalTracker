@@ -188,17 +188,20 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
   DateTime? end;
   String endString = "Select End Date";
 
-  void _dateSelection() {
-    DialogRoute<DateTime>(
+  Future<Null> _beginDateSelection() async {
+    begin = await showDatePicker(
         context: context,
-        builder: (BuildContext context) {
-          return DatePickerDialog(
-            initialEntryMode: DatePickerEntryMode.calendarOnly,
-            initialDate: DateTime.now(),
-            firstDate: DateTime.now(),
-            lastDate: DateTime.now(),
-          );
-        });
+        initialDate: DateTime.now(),
+        firstDate: DateTime.now().subtract(const Duration(days: 365)),
+        lastDate: DateTime.now().add(const Duration(days: 365)));
+  }
+
+  Future<Null> _endDateSelection() async {
+    end = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime.now().subtract(const Duration(days: 365)),
+        lastDate: DateTime.now().add(const Duration(days: 365)));
   }
 
   @override
@@ -209,11 +212,11 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
         Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           OutlinedButton(
             onPressed: () {
-              _dateSelection();
+              _beginDateSelection();
             },
             child: Text("Start Date"),
           ),
-          OutlinedButton(onPressed: _dateSelection, child: Text("EndDate"))
+          OutlinedButton(onPressed: _endDateSelection, child: Text("EndDate"))
         ]),
       ],
     ));
