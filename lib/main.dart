@@ -30,7 +30,8 @@ class MyApp extends StatelessWidget {
 class MyAppState extends ChangeNotifier {
   var goalList = <gc.GoalClass>[];
 
-  var selectedIndex = 0;
+  var appBarIndex = 0;
+  var pageIndex = 0;
 
   void addGoal(DateTime start, DateTime end, double perc) {
     goalList
@@ -49,7 +50,8 @@ class _Tracker extends State<Tracker> {
   Widget build(BuildContext ctx) {
     Widget page;
     var appState = ctx.watch<MyAppState>();
-    switch (appState.selectedIndex) {
+    //appState.pageIndex = appState.appBarIndex;
+    switch (appState.pageIndex) {
       case 0:
         page = HomePage();
         break;
@@ -57,6 +59,9 @@ class _Tracker extends State<Tracker> {
         page = ManagePage();
         break;
       case 2:
+        page = Placeholder();
+        break;
+      case 3:
         page = GoalCreatorPage();
         break;
       default:
@@ -86,11 +91,12 @@ class _Tracker extends State<Tracker> {
             label: 'Settings',
           ),
         ],
-        currentIndex: appState.selectedIndex,
+        currentIndex: appState.appBarIndex, //appState.selectedIndex,
         selectedItemColor: Color.fromARGB(255, 139, 12, 12),
         onTap: (index) {
           setState(() {
-            appState.selectedIndex = index;
+            appState.appBarIndex = index;
+            appState.pageIndex = index;
           });
         },
       ),
@@ -164,14 +170,14 @@ class _ManagePageState extends State<ManagePage> {
   Widget build(BuildContext ctx) {
     var appState = ctx.watch<MyAppState>();
 
-    void _createGoal() {
-      appState.selectedIndex = 2;
-      appState.notifyListeners();
-    }
-
     return Scaffold(
         floatingActionButton: FloatingActionButton(
-      onPressed: _createGoal,
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => GoalCreatorPage()),
+        );
+      },
       child: Icon(Icons.add),
     ));
   }
@@ -185,9 +191,9 @@ class GoalCreatorPage extends StatefulWidget {
 class _GoalCreatorPageState extends State<GoalCreatorPage> {
   String? goalName;
   DateTime? begin;
-  String beginString = "Select Start Date";
+  String beginString = "Start Date";
   DateTime? end;
-  String endString = "Select End Date";
+  String endString = "End Date";
 
   Future<Null> _beginDateSelection() async {
     begin = await showDatePicker(
@@ -195,6 +201,8 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
         initialDate: DateTime.now(),
         firstDate: DateTime.now().subtract(const Duration(days: 365)),
         lastDate: DateTime.now().add(const Duration(days: 365)));
+
+    beginString = begin.toString();
   }
 
   Future<Null> _endDateSelection() async {
@@ -223,9 +231,9 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
         Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           OutlinedButton(
             onPressed: _beginDateSelection,
-            child: Text("Start Date"),
+            child: Text(beginString),
           ),
-          OutlinedButton(onPressed: _endDateSelection, child: Text("EndDate")),
+          OutlinedButton(onPressed: _endDateSelection, child: Text(endString)),
         ]),
       ],
     ));
