@@ -194,6 +194,7 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
   String beginString = "Start Date";
   DateTime? end;
   String endString = "End Date";
+  bool confirmReady = false;
 
   Future<Null> _beginDateSelection() async {
     begin = await showDatePicker(
@@ -215,6 +216,13 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
 
   @override
   Widget build(BuildContext ctx) {
+    var appState = ctx.watch<MyAppState>();
+
+    void addGoal() {
+      gc.GoalClass goal = gc.GoalClass(begin, end, 0.0);
+      appState.goalList.add(goal);
+    }
+
     return Scaffold(
         body: Column(
       children: [
@@ -243,6 +251,12 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
                   Navigator.pop(context);
                 },
                 child: Text("Cancel")),
+            // ignore: sort_child_properties_last
+
+            OutlinedButton(
+              onPressed: addGoal, //confirmReady ? addGoal : null,
+              child: Text("Submit"),
+            )
           ],
         ),
       ],
