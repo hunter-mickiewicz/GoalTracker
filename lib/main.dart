@@ -235,6 +235,16 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
           ),
           OutlinedButton(onPressed: _endDateSelection, child: Text(endString)),
         ]),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            OutlinedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text("Cancel")),
+          ],
+        ),
       ],
     ));
   }
