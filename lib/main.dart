@@ -117,47 +117,57 @@ class _HomePageState extends State<HomePage> {
       msg = 'No goals';
     }
 
-    return ListView(
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.all(20),
-          child: Center(child: Text(msg)),
-        ),
-        for (var goal in goals)
-          Card(
-            child: ListTile(
-              minVerticalPadding: 2,
-              tileColor: Color.fromARGB(255, 78, 167, 118),
-              title: Column(
-                children: [
-                  Row(
+    return Scaffold(
+      body: ListView(
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Center(child: Text(msg)),
+          ),
+          for (var goal in goals)
+            Card(
+              child: Builder(builder: (context) {
+                return ListTile(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => GoalEditPage()),
+                    );
+                  },
+                  minVerticalPadding: 2,
+                  tileColor: Color.fromARGB(255, 78, 167, 118),
+                  title: Column(
+                    children: [
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("${goal.name}"),
+                            Text("${goal.getStringPercent()}%"),
+                          ]),
+                      perc.LinearPercentIndicator(
+                        percent: goal.percent!.toDouble(),
+                        backgroundColor: Colors.grey,
+                        progressColor: Colors.blue,
+                      ),
+                    ],
+                  ),
+                  subtitle: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text("${goal.name}"),
-                        Text("${goal.getStringPercent()}%"),
+                        Text(
+                          "${goal.begin!.month}/${goal.begin!.day}/${goal.begin!.year}",
+                        ),
+                        Text(" "),
+                        Text(
+                          "${goal.end!.month}/${goal.end!.day}/${goal.end!.year}",
+                        ),
                       ]),
-                  perc.LinearPercentIndicator(
-                    percent: goal.percent!.toDouble(),
-                    backgroundColor: Colors.grey,
-                    progressColor: Colors.blue,
-                  ),
-                ],
-              ),
-              subtitle: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "${goal.begin!.month}/${goal.begin!.day}/${goal.begin!.year}",
-                    ),
-                    Text(" "),
-                    Text(
-                      "${goal.end!.month}/${goal.end!.day}/${goal.end!.year}",
-                    ),
-                  ]),
-              //Text("${goal.begin!.month}/${goal.begin!.day}/${goal.begin!.year}    ${goal.end!.month}/${goal.end!.day}/${goal.end!.year}"),
+                  //Text("${goal.begin!.month}/${goal.begin!.day}/${goal.begin!.year}    ${goal.end!.month}/${goal.end!.day}/${goal.end!.year}"),
+                );
+              }),
             ),
-          ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -209,7 +219,9 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
         lastDate: DateTime.now().add(const Duration(days: 365)));
 
     setState(() {
-      beginString = "${begin!.month}/${begin!.day}/${begin!.year}";
+      if (begin != null) {
+        beginString = "${begin!.month}/${begin!.day}/${begin!.year}";
+      }
     });
   }
 
@@ -221,7 +233,9 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
         lastDate: DateTime.now().add(const Duration(days: 365)));
 
     setState(() {
-      endString = "${end!.month}/${end!.day}/${end!.year}";
+      if (end != null) {
+        endString = "${end!.month}/${end!.day}/${end!.year}";
+      }
     });
   }
 
@@ -326,5 +340,88 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
         ],
       ),
     );
+  }
+}
+
+class GoalEditPage extends StatefulWidget {
+  @override
+  _GoalEditPageState createState() => _GoalEditPageState();
+}
+
+class _GoalEditPageState extends State<GoalEditPage> {
+  @override
+  Widget build(BuildContext ctx) {
+    return Builder(builder: (context) {
+      return Scaffold(
+          body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          OutlinedButton(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => AllMilestonesPage()));
+              },
+              child: Text("View Milestones")),
+          OutlinedButton(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => AddMilestonePage()));
+              },
+              child: Text("Add Milestone")),
+          OutlinedButton(
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => EditGoalPage()));
+              },
+              child: Text("Edit Goal")),
+          OutlinedButton(
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => GoalCreatorPage()));
+              },
+              child: Text("Delete Goal")),
+        ],
+      ));
+    });
+  }
+}
+
+class AllMilestonesPage extends StatefulWidget {
+  @override
+  _AllMilestonesPageState createState() => _AllMilestonesPageState();
+}
+
+class _AllMilestonesPageState extends State<AllMilestonesPage> {
+  @override
+  Widget build(BuildContext ctx) {
+    return Scaffold();
+  }
+}
+
+class AddMilestonePage extends StatefulWidget {
+  @override
+  _AddMilestonePageState createState() => _AddMilestonePageState();
+}
+
+class _AddMilestonePageState extends State<AddMilestonePage> {
+  @override
+  Widget build(BuildContext ctx) {
+    return Scaffold();
+  }
+}
+
+class EditGoalPage extends StatefulWidget {
+  @override
+  _EditGoalPageState createState() => _EditGoalPageState();
+}
+
+class _EditGoalPageState extends State<EditGoalPage> {
+  @override
+  Widget build(BuildContext ctx) {
+    return Scaffold();
   }
 }
