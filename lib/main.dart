@@ -131,7 +131,7 @@ class _HomePageState extends State<HomePage> {
               title: Column(
                 children: [
                   Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text("${goal.name}"),
                         Text("${goal.getStringPercent()}%"),
@@ -208,7 +208,9 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
         firstDate: DateTime.now().subtract(const Duration(days: 365)),
         lastDate: DateTime.now().add(const Duration(days: 365)));
 
-    beginString = begin.toString();
+    setState(() {
+      beginString = "${begin!.month}/${begin!.day}/${begin!.year}";
+    });
   }
 
   Future<Null> _endDateSelection() async {
@@ -217,6 +219,10 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
         initialDate: DateTime.now(),
         firstDate: DateTime.now().subtract(const Duration(days: 365)),
         lastDate: DateTime.now().add(const Duration(days: 365)));
+
+    setState(() {
+      endString = "${end!.month}/${end!.day}/${end!.year}";
+    });
   }
 
   @override
@@ -232,6 +238,14 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
       percent = null;
     }
 
+    void _checkReady() {
+      if (begin != null && end != null && goalName != null && percent != null) {
+        confirmReady = true;
+      } else {
+        confirmReady = false;
+      }
+    }
+
     return Scaffold(
       body: Column(
         children: [
@@ -243,17 +257,31 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
                 border: OutlineInputBorder(),
                 contentPadding: EdgeInsets.symmetric(horizontal: 20)),
             onChanged: (text) {
-              goalName = text;
+              setState(() {
+                goalName = text;
+                _checkReady();
+              });
             },
           ),
 
           Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             OutlinedButton(
-              onPressed: _beginDateSelection,
+              onPressed: () {
+                setState(() {
+                  _beginDateSelection();
+                  _checkReady();
+                });
+              },
               child: Text(beginString),
             ),
             OutlinedButton(
-                onPressed: _endDateSelection, child: Text(endString)),
+                onPressed: () {
+                  setState(() {
+                    _endDateSelection();
+                    _checkReady();
+                  });
+                },
+                child: Text(endString)),
           ]),
 
           Text("Enter your percentage to completion"),
@@ -265,7 +293,10 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
                 border: OutlineInputBorder(),
                 contentPadding: EdgeInsets.symmetric(horizontal: 20)),
             onChanged: (text) {
-              percent = double.tryParse(text);
+              setState(() {
+                percent = double.tryParse(text);
+                _checkReady();
+              });
             },
           ),
 
@@ -282,9 +313,12 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
               // ignore: sort_child_properties_last
 
               OutlinedButton(
-                onPressed: () {
-                  addGoal();
-                }, //confirmReady ? addGoal : null,
+                onPressed: confirmReady
+                    ? () {
+                        addGoal();
+                        Navigator.pop(context);
+                      }
+                    : null,
                 child: Text("Submit"),
               )
             ],
