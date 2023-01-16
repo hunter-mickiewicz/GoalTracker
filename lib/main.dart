@@ -34,8 +34,8 @@ class MyAppState extends ChangeNotifier {
   var pageIndex = 0;
 
   void addGoal(DateTime start, DateTime end, double perc) {
-    goalList
-        .add(gc.GoalClass(DateTime.now(), DateTime.utc(2023, 12, 31), 0.69));
+    goalList.add(
+        gc.GoalClass(DateTime.now(), DateTime.utc(2023, 12, 31), 0.69, "test"));
     notifyListeners();
   }
 }
@@ -60,9 +60,6 @@ class _Tracker extends State<Tracker> {
         break;
       case 2:
         page = Placeholder();
-        break;
-      case 3:
-        page = GoalCreatorPage();
         break;
       default:
         page = Placeholder();
@@ -133,7 +130,12 @@ class _HomePageState extends State<HomePage> {
               tileColor: Color.fromARGB(255, 78, 167, 118),
               title: Column(
                 children: [
-                  Text("${goal.getStringPercent()}%"),
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Text("${goal.name}"),
+                        Text("${goal.getStringPercent()}%"),
+                      ]),
                   perc.LinearPercentIndicator(
                     percent: goal.percent!.toDouble(),
                     backgroundColor: Colors.grey,
@@ -195,6 +197,9 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
   DateTime? end;
   String endString = "End Date";
   bool confirmReady = false;
+  double? percent;
+  TextEditingController nameCont = TextEditingController();
+  TextEditingController percCont = TextEditingController();
 
   Future<Null> _beginDateSelection() async {
     begin = await showDatePicker(
@@ -219,47 +224,73 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
     var appState = ctx.watch<MyAppState>();
 
     void addGoal() {
-      gc.GoalClass goal = gc.GoalClass(begin, end, 0.0);
+      gc.GoalClass goal = gc.GoalClass(begin, end, percent, goalName);
       appState.goalList.add(goal);
+      begin = null;
+      end = null;
+      goalName = null;
+      percent = null;
     }
 
     return Scaffold(
-        body: Column(
-      children: [
-        Text("Goal Name"),
-        TextField(
-          decoration: InputDecoration(
-              focusColor: Color.fromARGB(255, 100, 98, 98),
-              border: OutlineInputBorder(),
-              contentPadding: EdgeInsets.symmetric(horizontal: 20)),
-          onChanged: (text) {
-            goalName = text;
-          },
-        ),
-        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          OutlinedButton(
-            onPressed: _beginDateSelection,
-            child: Text(beginString),
+      body: Column(
+        children: [
+          Text("Goal Name"),
+          TextField(
+            controller: nameCont,
+            decoration: InputDecoration(
+                focusColor: Color.fromARGB(255, 100, 98, 98),
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(horizontal: 20)),
+            onChanged: (text) {
+              goalName = text;
+            },
           ),
-          OutlinedButton(onPressed: _endDateSelection, child: Text(endString)),
-        ]),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            OutlinedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text("Cancel")),
-            // ignore: sort_child_properties_last
 
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             OutlinedButton(
-              onPressed: addGoal, //confirmReady ? addGoal : null,
-              child: Text("Submit"),
-            )
-          ],
-        ),
-      ],
-    ));
+              onPressed: _beginDateSelection,
+              child: Text(beginString),
+            ),
+            OutlinedButton(
+                onPressed: _endDateSelection, child: Text(endString)),
+          ]),
+
+          Text("Enter your percentage to completion"),
+          //error on any kind of text input here...
+          TextField(
+            controller: percCont,
+            decoration: InputDecoration(
+                focusColor: Color.fromARGB(255, 100, 98, 98),
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(horizontal: 20)),
+            onChanged: (text) {
+              percent = double.tryParse(text);
+            },
+          ),
+
+          //Error here on textfield and textformfield..
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              OutlinedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(context);
+                  },
+                  child: Text("Cancel")),
+              // ignore: sort_child_properties_last
+
+              OutlinedButton(
+                onPressed: () {
+                  addGoal();
+                }, //confirmReady ? addGoal : null,
+                child: Text("Submit"),
+              )
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }
