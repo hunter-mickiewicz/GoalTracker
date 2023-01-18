@@ -5,7 +5,7 @@ class GoalClass {
   DateTime? end;
   double? percent;
   String? name;
-  var milestones = <DateTime, List<String>>{};
+  var milestones = <String, List<String>>{};
 
   String getStringPercent() {
     return (percent! * 100).toString();
@@ -22,10 +22,11 @@ class GoalClass {
   void updateMilestones(DateTime dt, String milestone) {
     String hashable = usableDate(dt);
 
+    var entries = milestones.putIfAbsent(hashable, () => [milestone]);
+
     if (milestones.containsKey(hashable)) {
-      //add to array
-    } else {
-      //instantiate array for key
+      entries.add(milestone);
+      milestones.update(hashable, (entries) => entries);
     }
   }
 

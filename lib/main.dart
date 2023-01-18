@@ -29,6 +29,7 @@ class MyApp extends StatelessWidget {
 
 class MyAppState extends ChangeNotifier {
   var goalList = <gc.GoalClass>[];
+  var currGoal;
 
   var appBarIndex = 0;
   var pageIndex = 0;
@@ -129,6 +130,8 @@ class _HomePageState extends State<HomePage> {
               child: Builder(builder: (context) {
                 return ListTile(
                   onTap: () {
+                    appState.currGoal = goal;
+                    print(appState.currGoal);
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => GoalEditPage()),
@@ -162,7 +165,6 @@ class _HomePageState extends State<HomePage> {
                           "${goal.end!.month}/${goal.end!.day}/${goal.end!.year}",
                         ),
                       ]),
-                  //Text("${goal.begin!.month}/${goal.begin!.day}/${goal.begin!.year}    ${goal.end!.month}/${goal.end!.day}/${goal.end!.year}"),
                 );
               }),
             ),
@@ -417,9 +419,13 @@ class _AddMilestonePageState extends State<AddMilestonePage> {
   String milestoneDateString = "Milestone Date";
   TextEditingController milestoneCont = TextEditingController();
   String? milestone;
+  bool dateBool = false;
+  bool textBool = false;
+  bool confirmBool = false;
 
   @override
   Widget build(BuildContext ctx) {
+    var appState = ctx.watch<MyAppState>();
     Future<void> _addMilestoneDate() async {
       milestoneDate = await showDatePicker(
           context: context,
@@ -431,8 +437,20 @@ class _AddMilestonePageState extends State<AddMilestonePage> {
         if (milestoneDate != null) {
           milestoneDateString =
               "${milestoneDate!.month}/${milestoneDate!.day}/${milestoneDate!.year}";
+          dateBool = true;
         }
       });
+    }
+
+    void addMilestone() {
+      appState.currGoal.updateMilestones(milestoneDate, milestone);
+      print(appState.currGoal.milestones);
+    }
+
+    void _checkBools() {
+      if (dateBool && textBool) {
+        confirmBool = true;
+      }
     }
 
     return Scaffold(
@@ -462,6 +480,8 @@ class _AddMilestonePageState extends State<AddMilestonePage> {
                 onChanged: (text) {
                   setState(() {
                     milestone = text;
+                    textBool = true;
+                    _checkBools();
                   });
                 },
               ),
@@ -469,6 +489,20 @@ class _AddMilestonePageState extends State<AddMilestonePage> {
           )
         ],
       ),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          OutlinedButton(
+            onPressed: confirmBool
+                ? () {
+                    addMilestone();
+                    Navigator.pop(context);
+                  }
+                : null,
+            child: Text("Submit"),
+          )
+        ],
+      )
     ]));
   }
 }
