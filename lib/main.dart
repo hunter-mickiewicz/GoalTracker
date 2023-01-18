@@ -33,7 +33,7 @@ class MyAppState extends ChangeNotifier {
   var appBarIndex = 0;
   var pageIndex = 0;
 
-  void addGoal(DateTime start, DateTime end, double perc) {
+  void addTestGoal() {
     goalList.add(
         gc.GoalClass(DateTime.now(), DateTime.utc(2023, 12, 31), 0.69, "test"));
     notifyListeners();
@@ -168,6 +168,9 @@ class _HomePageState extends State<HomePage> {
             ),
         ],
       ),
+      floatingActionButton: FloatingActionButton(onPressed: () {
+        appState.addTestGoal();
+      }),
     );
   }
 }
@@ -313,9 +316,6 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
               });
             },
           ),
-
-          //Error here on textfield and textformfield..
-
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -351,42 +351,47 @@ class GoalEditPage extends StatefulWidget {
 class _GoalEditPageState extends State<GoalEditPage> {
   @override
   Widget build(BuildContext ctx) {
-    return Builder(builder: (context) {
-      return Scaffold(
-          body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          OutlinedButton(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => AllMilestonesPage()));
-              },
-              child: Text("View Milestones")),
-          OutlinedButton(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => AddMilestonePage()));
-              },
-              child: Text("Add Milestone")),
-          OutlinedButton(
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => EditGoalPage()));
-              },
-              child: Text("Edit Goal")),
-          OutlinedButton(
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => GoalCreatorPage()));
-              },
-              child: Text("Delete Goal")),
-        ],
-      ));
-    });
+    return Scaffold(
+        body: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            OutlinedButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => AllMilestonesPage()));
+                },
+                child: Text("View Milestones")),
+            OutlinedButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => AddMilestonePage()));
+                },
+                child: Text("Add Milestone")),
+            OutlinedButton(
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => EditGoalPage()));
+                },
+                child: Text("Edit Goal")),
+            OutlinedButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => GoalCreatorPage()));
+                },
+                child: Text("Delete Goal")),
+          ],
+        ),
+      ],
+    ));
   }
 }
 
@@ -408,9 +413,63 @@ class AddMilestonePage extends StatefulWidget {
 }
 
 class _AddMilestonePageState extends State<AddMilestonePage> {
+  DateTime? milestoneDate;
+  String milestoneDateString = "Milestone Date";
+  TextEditingController milestoneCont = TextEditingController();
+  String? milestone;
+
   @override
   Widget build(BuildContext ctx) {
-    return Scaffold();
+    Future<void> _addMilestoneDate() async {
+      milestoneDate = await showDatePicker(
+          context: context,
+          initialDate: DateTime.now(),
+          firstDate: DateTime.now().subtract(const Duration(days: 365)),
+          lastDate: DateTime.now().add(const Duration(days: 365)));
+
+      setState(() {
+        if (milestoneDate != null) {
+          milestoneDateString =
+              "${milestoneDate!.month}/${milestoneDate!.day}/${milestoneDate!.year}";
+        }
+      });
+    }
+
+    return Scaffold(
+        body: Column(children: [
+      Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        OutlinedButton(
+          onPressed: () {
+            setState(() {
+              _addMilestoneDate();
+            });
+          },
+          child: Text(milestoneDateString),
+        ),
+      ]),
+      Text(""),
+      Row(
+        children: [
+          Expanded(
+            child: Column(children: [
+              Text("Enter your milestone"),
+              TextField(
+                controller: milestoneCont,
+                decoration: InputDecoration(
+                    focusColor: Color.fromARGB(255, 100, 98, 98),
+                    border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 20)),
+                onChanged: (text) {
+                  setState(() {
+                    milestone = text;
+                  });
+                },
+              ),
+            ]),
+          )
+        ],
+      ),
+    ]));
   }
 }
 
