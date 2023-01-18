@@ -1,6 +1,9 @@
+import 'dart:collection';
+
 import 'package:percent_indicator/percent_indicator.dart' as perc;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:collection/collection.dart';
 import 'GoalClass.dart' as gc;
 
 void main() {
@@ -408,12 +411,12 @@ class _AllMilestonesPageState extends State<AllMilestonesPage> {
   @override
   Widget build(BuildContext ctx) {
     var appState = ctx.watch<MyAppState>();
+    final sorted = SplayTreeMap<String, dynamic>.from(
+        appState.currGoal.milestones, (a, b) => a.compareTo(b));
 
     if (appState.currGoal.milestones.isEmpty) {
       msg = "No milestones yet";
     }
-
-    void _displayMilestones() {}
 
     return Scaffold(
         body: ListView(children: <Widget>[
@@ -421,7 +424,8 @@ class _AllMilestonesPageState extends State<AllMilestonesPage> {
         padding: const EdgeInsets.all(20),
         child: Center(child: Text(msg)),
       ),
-      for (var entry in appState.currGoal.milestones.entries)
+      //Find some way to sort by key?
+      for (var entry in sorted.entries)
         for (var val in entry.value)
           Card(child: Builder(builder: (context) {
             return ListTile(
