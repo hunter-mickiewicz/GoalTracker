@@ -21,12 +21,14 @@ class GoalClass {
 
   void updateMilestones(DateTime dt, String milestone) {
     String hashable = usableDate(dt);
-
-    var entries = milestones.putIfAbsent(hashable, () => [milestone]);
+    var entries;
 
     if (milestones.containsKey(hashable)) {
+      entries = milestones.putIfAbsent(hashable, () => [milestone]);
       entries.add(milestone);
       milestones.update(hashable, (entries) => entries);
+    } else {
+      milestones.putIfAbsent(hashable, () => [milestone]);
     }
   }
 

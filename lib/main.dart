@@ -403,9 +403,33 @@ class AllMilestonesPage extends StatefulWidget {
 }
 
 class _AllMilestonesPageState extends State<AllMilestonesPage> {
+  String msg = "";
+
   @override
   Widget build(BuildContext ctx) {
-    return Scaffold();
+    var appState = ctx.watch<MyAppState>();
+
+    if (appState.currGoal.milestones.isEmpty) {
+      msg = "No milestones yet";
+    }
+
+    void _displayMilestones() {}
+
+    return Scaffold(
+        body: ListView(children: <Widget>[
+      Padding(
+        padding: const EdgeInsets.all(20),
+        child: Center(child: Text(msg)),
+      ),
+      for (var entry in appState.currGoal.milestones.entries)
+        for (var val in entry.value)
+          Card(child: Builder(builder: (context) {
+            return ListTile(
+              title: Text(entry.key),
+              subtitle: Text(val),
+            );
+          }))
+    ]));
   }
 }
 
@@ -492,6 +516,12 @@ class _AddMilestonePageState extends State<AddMilestonePage> {
       Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          OutlinedButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text("Cancel"),
+          ),
           OutlinedButton(
             onPressed: confirmBool
                 ? () {
