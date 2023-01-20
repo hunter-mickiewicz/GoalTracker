@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class GoalClass {
   DateTime? begin;
   DateTime? end;
-  double? percent;
+  double percent = 0;
   String? name;
   var milestones = <String, List<String>>{};
 
@@ -18,6 +18,10 @@ class GoalClass {
   }
 
   void editGoal() {}
+
+  void updatePercentage(double perc) {
+    percent += perc / 100;
+  }
 
   void updateMilestones(DateTime dt, String milestone) {
     String hashable = usableDate(dt);

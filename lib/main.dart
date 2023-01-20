@@ -121,6 +121,17 @@ class _HomePageState extends State<HomePage> {
       msg = 'No goals';
     }
 
+    Future<void> editGoalClick() async {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => GoalEditPage()),
+      );
+      appState.goalList.remove(appState.currGoal);
+      setState(() {
+        appState.goalList.add(appState.currGoal);
+      });
+    }
+
     return Scaffold(
       body: ListView(
         children: <Widget>[
@@ -134,11 +145,7 @@ class _HomePageState extends State<HomePage> {
                 return ListTile(
                   onTap: () {
                     appState.currGoal = goal;
-                    print(appState.currGoal);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => GoalEditPage()),
-                    );
+                    editGoalClick();
                   },
                   minVerticalPadding: 2,
                   tileColor: Color.fromARGB(255, 78, 167, 118),
@@ -356,6 +363,7 @@ class GoalEditPage extends StatefulWidget {
 class _GoalEditPageState extends State<GoalEditPage> {
   @override
   Widget build(BuildContext ctx) {
+    var appState = ctx.watch<MyAppState>();
     return Scaffold(
         body: Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -393,6 +401,12 @@ class _GoalEditPageState extends State<GoalEditPage> {
                           builder: (context) => GoalCreatorPage()));
                 },
                 child: Text("Delete Goal")),
+            Text(""),
+            OutlinedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text("Back")),
           ],
         ),
       ],
@@ -424,7 +438,6 @@ class _AllMilestonesPageState extends State<AllMilestonesPage> {
         padding: const EdgeInsets.all(20),
         child: Center(child: Text(msg)),
       ),
-      //Find some way to sort by key?
       for (var entry in sorted.entries)
         for (var val in entry.value)
           Card(child: Builder(builder: (context) {
@@ -450,6 +463,7 @@ class _AddMilestonePageState extends State<AddMilestonePage> {
   bool dateBool = false;
   bool textBool = false;
   bool confirmBool = false;
+  double? perc = 0;
 
   @override
   Widget build(BuildContext ctx) {
@@ -472,7 +486,7 @@ class _AddMilestonePageState extends State<AddMilestonePage> {
 
     void addMilestone() {
       appState.currGoal.updateMilestones(milestoneDate, milestone);
-      print(appState.currGoal.milestones);
+      appState.currGoal.updatePercentage(perc);
     }
 
     void _checkBools() {
@@ -514,6 +528,30 @@ class _AddMilestonePageState extends State<AddMilestonePage> {
                 },
               ),
             ]),
+          )
+        ],
+      ),
+      Text(""),
+      Row(
+        children: [
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text("Enter additional percentage completed"),
+                TextField(
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                        focusColor: Color.fromARGB(255, 100, 98, 98),
+                        border: OutlineInputBorder(),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 20)),
+                    onChanged: (text) {
+                      setState(() {
+                        perc = double.tryParse(text);
+                      });
+                    })
+              ],
+            ),
           )
         ],
       ),
