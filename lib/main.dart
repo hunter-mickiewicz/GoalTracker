@@ -33,6 +33,7 @@ class MyApp extends StatelessWidget {
 class MyAppState extends ChangeNotifier {
   var goalList = <gc.GoalClass>[];
   var currGoal;
+  bool editingMode = false;
 
   var appBarIndex = 0;
   var pageIndex = 0;
@@ -211,6 +212,7 @@ class _ManagePageState extends State<ManagePage> {
 }
 
 class GoalCreatorPage extends StatefulWidget {
+  bool editingMode = false;
   @override
   State<GoalCreatorPage> createState() => _GoalCreatorPageState();
 }
@@ -258,17 +260,35 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
   Widget build(BuildContext ctx) {
     var appState = ctx.watch<MyAppState>();
 
+    void changeGoal() {
+      begin != null ? begin = begin : begin = appState.currGoal.begin;
+      end != null ? end = end : end = appState.currGoal.end;
+      percent != null ? percent = percent : percent = appState.currGoal.percent;
+      goalName != null
+          ? goalName = goalName
+          : goalName = appState.currGoal.name;
+      appState.currGoal.editGoal(begin, end, percent, goalName);
+    }
+
     void addGoal() {
-      gc.GoalClass goal = gc.GoalClass(begin, end, percent, goalName);
-      appState.goalList.add(goal);
-      begin = null;
-      end = null;
-      goalName = null;
-      percent = null;
+      if (appState.editingMode) {
+        changeGoal();
+      } else {
+        gc.GoalClass goal = gc.GoalClass(begin, end, percent, goalName);
+        appState.goalList.add(goal);
+        begin = null;
+        end = null;
+        goalName = null;
+        percent = null;
+      }
     }
 
     void _checkReady() {
-      if (begin != null && end != null && goalName != null && percent != null) {
+      if (appState.editingMode ||
+          (begin != null &&
+              end != null &&
+              goalName != null &&
+              percent != null)) {
         confirmReady = true;
       } else {
         confirmReady = false;
@@ -341,7 +361,7 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
               OutlinedButton(
                 onPressed: confirmReady
                     ? () {
-                        addGoal();
+                        appState.editingMode ? changeGoal() : addGoal();
                         Navigator.pop(context);
                       }
                     : null,
@@ -361,6 +381,12 @@ class GoalEditPage extends StatefulWidget {
 }
 
 class _GoalEditPageState extends State<GoalEditPage> {
+  Future<void> goToEdit() async {
+    print("editing...");
+    await Navigator.push(
+        context, MaterialPageRoute(builder: (context) => GoalCreatorPage()));
+  }
+
   @override
   Widget build(BuildContext ctx) {
     var appState = ctx.watch<MyAppState>();
@@ -389,18 +415,12 @@ class _GoalEditPageState extends State<GoalEditPage> {
                 child: Text("Add Milestone")),
             OutlinedButton(
                 onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => EditGoalPage()));
+                  appState.editingMode = true;
+                  goToEdit();
+                  appState.editingMode = false;
                 },
                 child: Text("Edit Goal")),
-            OutlinedButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => GoalCreatorPage()));
-                },
-                child: Text("Delete Goal")),
+            OutlinedButton(onPressed: () {}, child: Text("Delete Goal")),
             Text(""),
             OutlinedButton(
                 onPressed: () {

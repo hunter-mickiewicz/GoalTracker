@@ -17,7 +17,12 @@ class GoalClass {
     return useful;
   }
 
-  void editGoal() {}
+  void editGoal(DateTime? st, DateTime? fn, double perc, String? nm) {
+    begin = st;
+    end = fn;
+    percent = perc;
+    name = nm;
+  }
 
   void updatePercentage(double perc) {
     percent += perc / 100;
