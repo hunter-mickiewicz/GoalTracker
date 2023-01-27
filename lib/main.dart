@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:developer';
 
 import 'package:percent_indicator/percent_indicator.dart' as perc;
 import 'package:flutter/material.dart';
@@ -259,11 +260,15 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
   @override
   Widget build(BuildContext ctx) {
     var appState = ctx.watch<MyAppState>();
+    log(appState.editingMode.toString());
 
     void changeGoal() {
+      log(percent.toString());
       begin != null ? begin = begin : begin = appState.currGoal.begin;
       end != null ? end = end : end = appState.currGoal.end;
-      percent != null ? percent = percent : percent = appState.currGoal.percent;
+      percent != null
+          ? percent = percent! / 100
+          : percent = appState.currGoal.percent;
       goalName != null
           ? goalName = goalName
           : goalName = appState.currGoal.name;
@@ -271,6 +276,7 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
     }
 
     void addGoal() {
+      log(appState.editingMode.toString());
       if (appState.editingMode) {
         changeGoal();
       } else {
@@ -382,7 +388,6 @@ class GoalEditPage extends StatefulWidget {
 
 class _GoalEditPageState extends State<GoalEditPage> {
   Future<void> goToEdit() async {
-    print("editing...");
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) => GoalCreatorPage()));
   }
@@ -417,7 +422,6 @@ class _GoalEditPageState extends State<GoalEditPage> {
                 onPressed: () {
                   appState.editingMode = true;
                   goToEdit();
-                  appState.editingMode = false;
                 },
                 child: Text("Edit Goal")),
             OutlinedButton(onPressed: () {}, child: Text("Delete Goal")),
