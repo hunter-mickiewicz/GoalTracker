@@ -130,7 +130,9 @@ class _HomePageState extends State<HomePage> {
       );
       appState.goalList.remove(appState.currGoal);
       setState(() {
-        appState.goalList.add(appState.currGoal);
+        if (appState.currGoal != null) {
+          appState.goalList.add(appState.currGoal);
+        }
       });
     }
 
@@ -260,10 +262,8 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
   @override
   Widget build(BuildContext ctx) {
     var appState = ctx.watch<MyAppState>();
-    log(appState.editingMode.toString());
 
     void changeGoal() {
-      log(percent.toString());
       begin != null ? begin = begin : begin = appState.currGoal.begin;
       end != null ? end = end : end = appState.currGoal.end;
       percent != null
@@ -276,7 +276,6 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
     }
 
     void addGoal() {
-      log(appState.editingMode.toString());
       if (appState.editingMode) {
         changeGoal();
       } else {
@@ -395,6 +394,49 @@ class _GoalEditPageState extends State<GoalEditPage> {
   @override
   Widget build(BuildContext ctx) {
     var appState = ctx.watch<MyAppState>();
+
+    Future<void> deleteGoal() async {
+      switch (await showDialog<int>(
+        context: context,
+        builder: (BuildContext context) {
+          return SimpleDialog(
+            alignment: Alignment.center,
+            title: Text("Are you sure you want to delete this goal?"),
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SimpleDialogOption(
+                    onPressed: () {
+                      Navigator.pop(context, 0);
+                    },
+                    child: Text("Delete"),
+                  ),
+                  SimpleDialogOption(
+                      onPressed: () {
+                        Navigator.pop(context, 1);
+                      },
+                      child: Text("Cancel"))
+                ],
+              )
+            ],
+          );
+        },
+      )) {
+        case 0:
+          setState(() {
+            appState.goalList.remove(appState.currGoal);
+          });
+          Navigator.pop(context);
+          appState.currGoal = null;
+          break;
+        case 1:
+          break;
+        default:
+          break;
+      }
+    }
+
     return Scaffold(
         body: Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -424,7 +466,11 @@ class _GoalEditPageState extends State<GoalEditPage> {
                   goToEdit();
                 },
                 child: Text("Edit Goal")),
-            OutlinedButton(onPressed: () {}, child: Text("Delete Goal")),
+            OutlinedButton(
+                onPressed: () {
+                  deleteGoal();
+                },
+                child: Text("Delete Goal")),
             Text(""),
             OutlinedButton(
                 onPressed: () {
@@ -609,6 +655,18 @@ class EditGoalPage extends StatefulWidget {
 }
 
 class _EditGoalPageState extends State<EditGoalPage> {
+  @override
+  Widget build(BuildContext ctx) {
+    return Scaffold();
+  }
+}
+
+class DeleteGoalPage extends StatefulWidget {
+  @override
+  _DeleteGoalPageState createState() => _DeleteGoalPageState();
+}
+
+class _DeleteGoalPageState extends State<DeleteGoalPage> {
   @override
   Widget build(BuildContext ctx) {
     return Scaffold();
