@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class GoalClass {
   DateTime? begin;
   DateTime? end;
@@ -8,7 +6,7 @@ class GoalClass {
   var milestones = <String, List<String>>{};
 
   String getStringPercent() {
-    return (percent! * 100).toString();
+    return (percent * 100).toString();
   }
 
   String usableDate(DateTime dt) {
@@ -30,7 +28,7 @@ class GoalClass {
 
   void updateMilestones(DateTime dt, String milestone) {
     String hashable = usableDate(dt);
-    var entries;
+    List<String> entries;
 
     if (milestones.containsKey(hashable)) {
       entries = milestones.putIfAbsent(hashable, () => [milestone]);

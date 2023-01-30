@@ -1,10 +1,12 @@
 import 'dart:collection';
 import 'dart:developer';
+import 'dart:io';
 
+import 'package:path_provider/path_provider.dart';
+import 'package:test/test.dart';
 import 'package:percent_indicator/percent_indicator.dart' as perc;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:collection/collection.dart';
 import 'GoalClass.dart' as gc;
 
 void main() {
@@ -32,6 +34,22 @@ class MyApp extends StatelessWidget {
 }
 
 class MyAppState extends ChangeNotifier {
+  Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
+
+    return directory.path;
+  }
+
+  Future<File> get _localFile async {
+    final path = await _localPath;
+
+    return File('$path/savedata.txt');
+  }
+
+  Future<void> readSave() async {}
+
+  Future<void> writeSave() async {}
+
   var goalList = <gc.GoalClass>[];
   var currGoal;
   bool editingMode = false;
@@ -162,7 +180,7 @@ class _HomePageState extends State<HomePage> {
                             Text("${goal.getStringPercent()}%"),
                           ]),
                       perc.LinearPercentIndicator(
-                        percent: goal.percent!.toDouble(),
+                        percent: goal.percent.toDouble(),
                         backgroundColor: Colors.grey,
                         progressColor: Colors.blue,
                       ),
@@ -199,8 +217,6 @@ class ManagePage extends StatefulWidget {
 class _ManagePageState extends State<ManagePage> {
   @override
   Widget build(BuildContext ctx) {
-    var appState = ctx.watch<MyAppState>();
-
     return Scaffold(
         floatingActionButton: FloatingActionButton(
       onPressed: () {
@@ -214,6 +230,7 @@ class _ManagePageState extends State<ManagePage> {
   }
 }
 
+// ignore: must_be_immutable
 class GoalCreatorPage extends StatefulWidget {
   bool editingMode = false;
   @override
@@ -231,7 +248,9 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
   TextEditingController nameCont = TextEditingController();
   TextEditingController percCont = TextEditingController();
 
-  Future<Null> _beginDateSelection() async {
+  void saveGoal() {}
+
+  Future<void> _beginDateSelection() async {
     begin = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
@@ -245,7 +264,7 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
     });
   }
 
-  Future<Null> _endDateSelection() async {
+  Future<void> _endDateSelection() async {
     end = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
