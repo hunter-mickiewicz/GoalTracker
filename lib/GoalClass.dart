@@ -18,12 +18,16 @@ class GoalClass {
   void editGoal(DateTime? st, DateTime? fn, double perc, String? nm) {
     begin = st;
     end = fn;
-    percent = perc;
+    percent = updatePercentage(perc);
     name = nm;
   }
 
-  void updatePercentage(double perc) {
-    percent += perc / 100;
+  double updatePercentage(double perc) {
+    double p = perc;
+    if (perc >= 1.0) {
+      p = perc / 100;
+    }
+    return p;
   }
 
   void updateMilestones(DateTime dt, String milestone) {
@@ -39,15 +43,11 @@ class GoalClass {
     }
   }
 
-  GoalClass(var beginDate, var endDate, var startPercent, var goalName) {
+  GoalClass(DateTime? beginDate, DateTime? endDate, double startPercent,
+      String? goalName) {
     begin = beginDate;
     end = endDate;
     name = goalName;
-
-    if (startPercent > 1.0) {
-      percent = startPercent / 100;
-    } else {
-      percent = startPercent;
-    }
+    percent = updatePercentage(startPercent);
   }
 }

@@ -298,7 +298,7 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
       if (appState.editingMode) {
         changeGoal();
       } else {
-        gc.GoalClass goal = gc.GoalClass(begin, end, percent, goalName);
+        gc.GoalClass goal = gc.GoalClass(begin, end, percent!, goalName);
         appState.goalList.add(goal);
         begin = null;
         end = null;
