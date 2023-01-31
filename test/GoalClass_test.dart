@@ -35,5 +35,6 @@ main() {
     test('Milestones should be empty', () {
       expect(goal.milestones.length, 0);
     });
+    //add/edit milestone
   });
 }
