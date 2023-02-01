@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:namer_app/GoalClass.dart';
+import 'package:goal_tracker/GoalClass.dart';
 import 'package:test/test.dart';
 
 main() {

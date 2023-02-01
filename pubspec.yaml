@@ -1,4 +1,4 @@
-name: namer_app
+name: goal_tracker
 description: A new Flutter project.
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -18,9 +18,11 @@ dependencies:
   path_provider: ^2.0.12
 
 dev_dependencies:
-  test: ^1.22.2
+  test: 
 
   flutter_lints: ^2.0.0
+  flutter_test:
+    sdk: flutter
 
 flutter:
   uses-material-design: true
