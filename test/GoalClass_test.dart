@@ -1,3 +1,5 @@
+// ignore_for_file: unused_import
+
 import 'dart:developer';
 import 'dart:io';
 
@@ -30,7 +32,7 @@ main() {
       expect(goal.milestones.length, 0);
     });
 
-    test('Milestones should be properlly added and hashable', () {
+    test('Milestones should be properly added and hashable', () {
       goal.updateMilestones(DateTime(2022), "milestone test");
       expect(goal.milestones.length, 1);
       expect(goal.milestones[goal.usableDate(DateTime(2022))]![0],

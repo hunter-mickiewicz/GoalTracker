@@ -1,3 +1,4 @@
+// ignore: file_names
 class GoalClass {
   DateTime? begin;
   DateTime? end;
