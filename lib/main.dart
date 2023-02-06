@@ -62,6 +62,11 @@ class MyAppState extends ChangeNotifier {
         gc.GoalClass(DateTime.now(), DateTime.utc(2023, 12, 31), 0.69, "test"));
     notifyListeners();
   }
+
+  void addGoal(gc.GoalClass goal) {
+    goalList.add(goal);
+    notifyListeners();
+  }
 }
 
 class Tracker extends StatefulWidget {
@@ -125,46 +130,10 @@ class _Tracker extends State<Tracker> {
   }
 }
 
-class HomePage extends StatefulWidget {
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
+/*class GoalDisplay extends ChangeNotifier{
 
-class _HomePageState extends State<HomePage> {
-  @override
-  Widget build(BuildContext ctx) {
-    var appState = ctx.watch<MyAppState>();
-    var goals = appState.goalList;
-    var msg = '';
 
-    if (goals.isEmpty) {
-      msg = 'No goals';
-    }
-
-    Future<void> editGoalClick() async {
-      await Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => GoalEditPage()),
-      );
-      appState.goalList.remove(appState.currGoal);
-      setState(() {
-        if (appState.currGoal != null) {
-          appState.goalList.add(appState.currGoal);
-        }
-      });
-    }
-
-    return Scaffold(
-      body: ListView(
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Center(child: Text(msg)),
-          ),
-          for (var goal in goals)
-            Card(
-              child: Builder(builder: (context) {
-                return ListTile(
+  /*return ListTile(
                   onTap: () {
                     appState.currGoal = goal;
                     editGoalClick();
@@ -197,7 +166,36 @@ class _HomePageState extends State<HomePage> {
                           "${goal.end!.month}/${goal.end!.day}/${goal.end!.year}",
                         ),
                       ]),
-                );
+                );*/
+}*/
+
+class HomePage extends StatefulWidget {
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  @override
+  Widget build(BuildContext ctx) {
+    var appState = ctx.watch<MyAppState>();
+    var goals = appState.goalList;
+    var msg = '';
+
+    if (goals.isEmpty) {
+      msg = 'No goals';
+    }
+
+    return Scaffold(
+      body: ListView(
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Center(child: Text(msg)),
+          ),
+          for (var goal in goals)
+            Card(
+              child: Builder(builder: (context) {
+                return GoalDisplay(appState: appState, goal: goal);
               }),
             ),
         ],
@@ -205,6 +203,64 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: FloatingActionButton(onPressed: () {
         appState.addTestGoal();
       }),
+    );
+  }
+}
+
+class GoalDisplay extends StatelessWidget {
+  const GoalDisplay({
+    super.key,
+    required this.appState,
+    required this.goal,
+  });
+
+  final MyAppState appState;
+  final gc.GoalClass goal;
+
+  @override
+  Widget build(BuildContext context) {
+    Future<void> editGoalClick() async {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => GoalEditPage()),
+      );
+      appState.goalList.remove(appState.currGoal);
+      if (appState.currGoal != null) {
+        appState.goalList.add(appState.currGoal);
+        appState.notifyListeners();
+      }
+    }
+
+    return ListTile(
+      onTap: () {
+        appState.currGoal = goal;
+        editGoalClick();
+      },
+      minVerticalPadding: 2,
+      tileColor: Color.fromARGB(255, 78, 167, 118),
+      title: Column(
+        children: [
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Text("${goal.name}"),
+            Text("${goal.getStringPercent()}%"),
+          ]),
+          perc.LinearPercentIndicator(
+            percent: goal.percent.toDouble(),
+            backgroundColor: Colors.grey,
+            progressColor: Colors.blue,
+          ),
+        ],
+      ),
+      subtitle:
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+        Text(
+          "${goal.begin!.month}/${goal.begin!.day}/${goal.begin!.year}",
+        ),
+        Text(" "),
+        Text(
+          "${goal.end!.month}/${goal.end!.day}/${goal.end!.year}",
+        ),
+      ]),
     );
   }
 }
@@ -445,6 +501,7 @@ class _GoalEditPageState extends State<GoalEditPage> {
         case 0:
           setState(() {
             appState.goalList.remove(appState.currGoal);
+            appState.notifyListeners();
           });
           Navigator.pop(context);
           appState.currGoal = null;
