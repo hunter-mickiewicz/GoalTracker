@@ -231,37 +231,39 @@ class GoalDisplay extends StatelessWidget {
       }
     }
 
-    return ListTile(
-      onTap: () {
-        appState.currGoal = goal;
-        editGoalClick();
-      },
-      minVerticalPadding: 2,
-      tileColor: Color.fromARGB(255, 78, 167, 118),
-      title: Column(
-        children: [
-          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Text("${goal.name}"),
-            Text("${goal.getStringPercent()}%"),
-          ]),
-          perc.LinearPercentIndicator(
-            percent: goal.percent.toDouble(),
-            backgroundColor: Colors.grey,
-            progressColor: Colors.blue,
+    return MaterialApp(home: Builder(builder: (context) {
+      return ListTile(
+        onTap: () {
+          appState.currGoal = goal;
+          editGoalClick();
+        },
+        minVerticalPadding: 2,
+        tileColor: Color.fromARGB(255, 78, 167, 118),
+        title: Column(
+          children: [
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              Text("${goal.name}"),
+              Text("${goal.getStringPercent()}%"),
+            ]),
+            perc.LinearPercentIndicator(
+              percent: goal.percent.toDouble(),
+              backgroundColor: Colors.grey,
+              progressColor: Colors.blue,
+            ),
+          ],
+        ),
+        subtitle:
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          Text(
+            "${goal.begin!.month}/${goal.begin!.day}/${goal.begin!.year}",
           ),
-        ],
-      ),
-      subtitle:
-          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        Text(
-          "${goal.begin!.month}/${goal.begin!.day}/${goal.begin!.year}",
-        ),
-        Text(" "),
-        Text(
-          "${goal.end!.month}/${goal.end!.day}/${goal.end!.year}",
-        ),
-      ]),
-    );
+          Text(" "),
+          Text(
+            "${goal.end!.month}/${goal.end!.day}/${goal.end!.year}",
+          ),
+        ]),
+      );
+    }));
   }
 }
 

@@ -11,13 +11,13 @@ void main() {
 
     final goal = GoalClass(DateTime(2022), DateTime(2023), 12, 'test');
     await tester.pumpWidget(MaterialApp(
-        home: GoalDisplay(
+        home: Scaffold(
+            body: GoalDisplay(
       appState: appState,
       goal: goal,
-    )));
-    /*appState.addGoal(goal);
+    ))));
 
-    final messageFinder = find.text('test');
-    expect(messageFinder, findsOneWidget);*/
-  }, skip: true);
+    final widgetFinder = find.text('test');
+    expect(widgetFinder, findsOneWidget);
+  });
 }
