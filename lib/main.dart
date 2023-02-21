@@ -311,6 +311,9 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
     }
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text(appState.editingMode ? "Edit Goal" : "New Goal"),
+      ),
       body: Column(
         children: [
           Text("Goal Name"),
@@ -449,49 +452,47 @@ class _GoalEditPageState extends State<GoalEditPage> {
     }
 
     return Scaffold(
+        appBar: AppBar(
+          title: Text(appState.currGoal == null ? "" : appState.currGoal.name),
+        ),
         body: Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            OutlinedButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => AllMilestonesPage()));
-                },
-                child: Text("View Milestones")),
-            OutlinedButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => AddMilestonePage()));
-                },
-                child: Text("Add Milestone")),
-            OutlinedButton(
-                onPressed: () {
-                  appState.editingMode = true;
-                  goToEdit();
-                },
-                child: Text("Edit Goal")),
-            OutlinedButton(
-                onPressed: () {
-                  deleteGoal();
-                },
-                child: Text("Delete Goal")),
-            Text(""),
-            OutlinedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text("Back")),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                OutlinedButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AllMilestonesPage()));
+                    },
+                    child: Text("View Milestones")),
+                OutlinedButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AddMilestonePage()));
+                    },
+                    child: Text("Add Milestone")),
+                OutlinedButton(
+                    onPressed: () {
+                      appState.editingMode = true;
+                      goToEdit();
+                    },
+                    child: Text("Edit Goal")),
+                OutlinedButton(
+                    onPressed: () {
+                      deleteGoal();
+                    },
+                    child: Text("Delete Goal")),
+                Text(""),
+              ],
+            ),
           ],
-        ),
-      ],
-    ));
+        ));
   }
 }
 
@@ -514,20 +515,21 @@ class _AllMilestonesPageState extends State<AllMilestonesPage> {
     }
 
     return Scaffold(
+        appBar: AppBar(title: Text("Milestones")),
         body: ListView(children: <Widget>[
-      Padding(
-        padding: const EdgeInsets.all(20),
-        child: Center(child: Text(msg)),
-      ),
-      for (var entry in sorted.entries)
-        for (var val in entry.value)
-          Card(child: Builder(builder: (context) {
-            return ListTile(
-              title: Text(entry.key),
-              subtitle: Text(val),
-            );
-          }))
-    ]));
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Center(child: Text(msg)),
+          ),
+          for (var entry in sorted.entries)
+            for (var val in entry.value)
+              Card(child: Builder(builder: (context) {
+                return ListTile(
+                  title: Text(entry.key),
+                  subtitle: Text(val),
+                );
+              }))
+        ]));
   }
 }
 
@@ -577,109 +579,87 @@ class _AddMilestonePageState extends State<AddMilestonePage> {
     }
 
     return Scaffold(
+        appBar: AppBar(title: Text("New Milestone")),
         body: Column(children: [
-      Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-        OutlinedButton(
-          onPressed: () {
-            setState(() {
-              _addMilestoneDate();
-            });
-          },
-          child: Text(milestoneDateString),
-        ),
-      ]),
-      Text(""),
-      Row(
-        children: [
-          Expanded(
-            child: Column(children: [
-              Text("Enter your milestone"),
-              TextField(
-                controller: milestoneCont,
-                decoration: InputDecoration(
-                    focusColor: Color.fromARGB(255, 100, 98, 98),
-                    border: OutlineInputBorder(),
-                    contentPadding: EdgeInsets.symmetric(horizontal: 20)),
-                onChanged: (text) {
-                  setState(() {
-                    milestone = text;
-                    textBool = true;
-                    _checkBools();
-                  });
-                },
-              ),
-            ]),
-          )
-        ],
-      ),
-      Text(""),
-      Row(
-        children: [
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text("Enter additional percentage completed"),
-                TextField(
-                    keyboardType: TextInputType.number,
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            OutlinedButton(
+              onPressed: () {
+                setState(() {
+                  _addMilestoneDate();
+                });
+              },
+              child: Text(milestoneDateString),
+            ),
+          ]),
+          Text(""),
+          Row(
+            children: [
+              Expanded(
+                child: Column(children: [
+                  Text("Enter your milestone"),
+                  TextField(
+                    controller: milestoneCont,
                     decoration: InputDecoration(
                         focusColor: Color.fromARGB(255, 100, 98, 98),
                         border: OutlineInputBorder(),
                         contentPadding: EdgeInsets.symmetric(horizontal: 20)),
                     onChanged: (text) {
                       setState(() {
-                        perc = double.tryParse(text);
+                        milestone = text;
+                        textBool = true;
+                        _checkBools();
                       });
-                    })
-              ],
-            ),
-          )
-        ],
-      ),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          OutlinedButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: Text("Cancel"),
+                    },
+                  ),
+                ]),
+              )
+            ],
           ),
-          OutlinedButton(
-            onPressed: confirmBool
-                ? () {
-                    addMilestone();
-                    Navigator.pop(context);
-                  }
-                : null,
-            child: Text("Submit"),
+          Text(""),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("Enter additional percentage completed"),
+                    TextField(
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                            focusColor: Color.fromARGB(255, 100, 98, 98),
+                            border: OutlineInputBorder(),
+                            contentPadding:
+                                EdgeInsets.symmetric(horizontal: 20)),
+                        onChanged: (text) {
+                          setState(() {
+                            perc = double.tryParse(text);
+                          });
+                        })
+                  ],
+                ),
+              )
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              OutlinedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text("Cancel"),
+              ),
+              OutlinedButton(
+                onPressed: confirmBool
+                    ? () {
+                        addMilestone();
+                        Navigator.pop(context);
+                      }
+                    : null,
+                child: Text("Submit"),
+              )
+            ],
           )
-        ],
-      )
-    ]));
-  }
-}
-
-class EditGoalPage extends StatefulWidget {
-  @override
-  _EditGoalPageState createState() => _EditGoalPageState();
-}
-
-class _EditGoalPageState extends State<EditGoalPage> {
-  @override
-  Widget build(BuildContext ctx) {
-    return Scaffold();
-  }
-}
-
-class DeleteGoalPage extends StatefulWidget {
-  @override
-  _DeleteGoalPageState createState() => _DeleteGoalPageState();
-}
-
-class _DeleteGoalPageState extends State<DeleteGoalPage> {
-  @override
-  Widget build(BuildContext ctx) {
-    return Scaffold();
+        ]));
   }
 }
