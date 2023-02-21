@@ -20,4 +20,6 @@ void main() {
     final widgetFinder = find.text('test');
     expect(widgetFinder, findsOneWidget);
   });
+
+  testWidgets('', (tester) async {});
 }

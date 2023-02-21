@@ -60,6 +60,8 @@ class MyAppState extends ChangeNotifier {
   void addTestGoal() {
     goalList.add(
         gc.GoalClass(DateTime.now(), DateTime.utc(2023, 12, 31), 0.69, "test"));
+
+    log("here");
     notifyListeners();
   }
 
@@ -84,9 +86,6 @@ class _Tracker extends State<Tracker> {
       case 0:
         page = HomePage();
         break;
-      case 1:
-        page = ManagePage();
-        break;
       case 2:
         page = Placeholder();
         break;
@@ -109,10 +108,6 @@ class _Tracker extends State<Tracker> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.manage_accounts),
-            label: 'Manage',
-          ),
-          BottomNavigationBarItem(
             icon: Icon(Icons.settings),
             label: 'Settings',
           ),
@@ -129,45 +124,6 @@ class _Tracker extends State<Tracker> {
     );
   }
 }
-
-/*class GoalDisplay extends ChangeNotifier{
-
-
-  /*return ListTile(
-                  onTap: () {
-                    appState.currGoal = goal;
-                    editGoalClick();
-                  },
-                  minVerticalPadding: 2,
-                  tileColor: Color.fromARGB(255, 78, 167, 118),
-                  title: Column(
-                    children: [
-                      Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text("${goal.name}"),
-                            Text("${goal.getStringPercent()}%"),
-                          ]),
-                      perc.LinearPercentIndicator(
-                        percent: goal.percent.toDouble(),
-                        backgroundColor: Colors.grey,
-                        progressColor: Colors.blue,
-                      ),
-                    ],
-                  ),
-                  subtitle: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "${goal.begin!.month}/${goal.begin!.day}/${goal.begin!.year}",
-                        ),
-                        Text(" "),
-                        Text(
-                          "${goal.end!.month}/${goal.end!.day}/${goal.end!.year}",
-                        ),
-                      ]),
-                );*/
-}*/
 
 class HomePage extends StatefulWidget {
   @override
@@ -231,60 +187,37 @@ class GoalDisplay extends StatelessWidget {
       }
     }
 
-    return MaterialApp(home: Builder(builder: (context) {
-      return ListTile(
-        onTap: () {
-          appState.currGoal = goal;
-          editGoalClick();
-        },
-        minVerticalPadding: 2,
-        tileColor: Color.fromARGB(255, 78, 167, 118),
-        title: Column(
-          children: [
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Text("${goal.name}"),
-              Text("${goal.getStringPercent()}%"),
-            ]),
-            perc.LinearPercentIndicator(
-              percent: goal.percent.toDouble(),
-              backgroundColor: Colors.grey,
-              progressColor: Colors.blue,
-            ),
-          ],
-        ),
-        subtitle:
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text(
-            "${goal.begin!.month}/${goal.begin!.day}/${goal.begin!.year}",
-          ),
-          Text(" "),
-          Text(
-            "${goal.end!.month}/${goal.end!.day}/${goal.end!.year}",
-          ),
-        ]),
-      );
-    }));
-  }
-}
-
-class ManagePage extends StatefulWidget {
-  @override
-  State<ManagePage> createState() => _ManagePageState();
-}
-
-class _ManagePageState extends State<ManagePage> {
-  @override
-  Widget build(BuildContext ctx) {
-    return Scaffold(
-        floatingActionButton: FloatingActionButton(
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => GoalCreatorPage()),
-        );
+    return ListTile(
+      onTap: () {
+        appState.currGoal = goal;
+        editGoalClick();
       },
-      child: Icon(Icons.add),
-    ));
+      minVerticalPadding: 2,
+      tileColor: Color.fromARGB(255, 78, 167, 118),
+      title: Column(
+        children: [
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Text("${goal.name}"),
+            Text("${goal.getStringPercent()}%"),
+          ]),
+          perc.LinearPercentIndicator(
+            percent: goal.percent.toDouble(),
+            backgroundColor: Colors.grey,
+            progressColor: Colors.blue,
+          ),
+        ],
+      ),
+      subtitle:
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+        Text(
+          "${goal.begin!.month}/${goal.begin!.day}/${goal.begin!.year}",
+        ),
+        Text(" "),
+        Text(
+          "${goal.end!.month}/${goal.end!.day}/${goal.end!.year}",
+        ),
+      ]),
+    );
   }
 }
 
