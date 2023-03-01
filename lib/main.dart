@@ -3,7 +3,7 @@ import 'dart:collection';
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:goal_tracker/goalClass.dart';
+//import 'package:goal_tracker/goalClass.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:percent_indicator/percent_indicator.dart' as perc;
 import 'package:flutter/material.dart';
