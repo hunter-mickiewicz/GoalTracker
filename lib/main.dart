@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:goal_tracker/goalClass.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:percent_indicator/percent_indicator.dart' as perc;
 import 'package:flutter/material.dart';
@@ -63,6 +64,14 @@ class MyAppState extends ChangeNotifier {
     goalList[0].updateMilestones(DateTime.now(), "test milestone");
 
     notifyListeners();
+  }
+
+  void testJson(gc.GoalClass goal) {
+    Map<String, dynamic> jsonGoal = goal.toJson();
+    log(jsonGoal.toString());
+
+    gc.GoalClass newgl = gc.GoalClass.fromJson(jsonGoal);
+    log(newgl.print());
   }
 
   void addGoal(gc.GoalClass goal) {
@@ -158,7 +167,7 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: FloatingActionButton(onPressed: () {
         appState.addTestGoal();
-        log(appState.goalList[0].toJson().toString());
+        appState.testJson(appState.goalList[0]);
       }),
     );
   }

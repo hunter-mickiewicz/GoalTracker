@@ -61,4 +61,21 @@ class GoalClass {
         'end': end,
         'milestones': milestones,
       };
+
+  GoalClass.fromJson(Map<String, dynamic> json)
+      : name = json['name'],
+        percent = json['percent'],
+        begin = json['begin'],
+        end = json['end'],
+        milestones = json['milestones'];
+
+  String print() {
+    return """
+      name: $name,
+      percent: $percent,
+      begin: $begin,
+      end: $end,
+      milestones: $milestones
+    """;
+  }
 }
