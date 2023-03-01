@@ -52,5 +52,18 @@ main() {
     test('GetStringPercent returns the proper percentage as a string', () {
       expect(goal.getStringPercent(), '40.0');
     });
+
+    log(goal.toJson.toString());
+    test('toJson returns the correct serialization', () {
+      Map<String, dynamic> testJson = goal.toJson();
+      expect(testJson['name'], 'update');
+      expect(testJson['percent'], 0.4);
+      expect(testJson['begin'], DateTime(2023));
+      expect(testJson['end'], DateTime(2024));
+      expect(testJson['milestones']['1/1/2022'],
+          ['milestone test', 'second test']);
+      //expect(goal.toJson(),
+      //    "'name': 'update','percent': 0.4,'begin': DateTime:2023-01-01 00:00:00.000,'end': DateTime:2024-01-01 00:00:00.000,'milestones': {'1/1/2022': ['milestone test', 'second test']}");
+    });
   });
 }

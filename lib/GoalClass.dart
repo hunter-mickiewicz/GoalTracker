@@ -1,3 +1,5 @@
+import 'dart:convert' as cnv;
+
 // ignore: file_names
 class GoalClass {
   DateTime? begin;
@@ -51,4 +53,12 @@ class GoalClass {
     name = goalName;
     percent = updatePercentage(startPercent);
   }
+
+  Map<String, dynamic> toJson() => {
+        'name': name,
+        'percent': percent,
+        'begin': begin,
+        'end': end,
+        'milestones': milestones,
+      };
 }

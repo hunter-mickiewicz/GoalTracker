@@ -60,8 +60,8 @@ class MyAppState extends ChangeNotifier {
   void addTestGoal() {
     goalList.add(
         gc.GoalClass(DateTime.now(), DateTime.utc(2023, 12, 31), 0.69, "test"));
+    goalList[0].updateMilestones(DateTime.now(), "test milestone");
 
-    log("here");
     notifyListeners();
   }
 
@@ -158,6 +158,7 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: FloatingActionButton(onPressed: () {
         appState.addTestGoal();
+        log(appState.goalList[0].toJson().toString());
       }),
     );
   }
