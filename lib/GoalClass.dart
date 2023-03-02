@@ -1,4 +1,8 @@
-import 'dart:convert' as cnv;
+import 'dart:developer';
+import 'dart:io';
+import 'dart:convert';
+
+import 'package:path_provider/path_provider.dart';
 
 // ignore: file_names
 class GoalClass {
@@ -6,16 +10,30 @@ class GoalClass {
   DateTime? end;
   double percent = 0;
   String? name;
+  String? fileName;
   var milestones = <String, List<String>>{};
 
   String getStringPercent() {
     return (percent * 100).toString();
   }
 
+  String updateFileName() {
+    return fileName = createFileName(name!, begin!);
+  }
+
   String usableDate(DateTime dt) {
     String useful = "${dt.month}/${dt.day}/${dt.year}";
 
     return useful;
+  }
+
+  String dataDate(DateTime dt) {
+    return "${dt.month}-${dt.day}-${dt.year}";
+  }
+
+  String createFileName(String name, DateTime date) {
+    int endIndex = name.length >= 7 ? 7 : name.length;
+    return (name.substring(0, endIndex) + dataDate(date));
   }
 
   void editGoal(DateTime? st, DateTime? fn, double perc, String? nm) {
@@ -57,8 +75,8 @@ class GoalClass {
   Map<String, dynamic> toJson() => {
         'name': name,
         'percent': percent,
-        'begin': begin,
-        'end': end,
+        'begin': dataDate(begin!),
+        'end': dataDate(end!),
         'milestones': milestones,
       };
 
@@ -73,8 +91,8 @@ class GoalClass {
     return """
       name: $name,
       percent: $percent,
-      begin: $begin,
-      end: $end,
+      begin: ${dataDate(begin!)},
+      end: ${dataDate(end!)},
       milestones: $milestones
     """;
   }

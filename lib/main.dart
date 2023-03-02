@@ -1,13 +1,14 @@
 import 'dart:collection';
+import 'dart:convert';
 // ignore: unused_import
 import 'dart:developer';
 import 'dart:io';
 
-//import 'package:goal_tracker/goalClass.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:percent_indicator/percent_indicator.dart' as perc;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'FileIO.dart';
 import 'GoalClass.dart' as gc;
 
 void main() {
@@ -41,12 +42,6 @@ class MyAppState extends ChangeNotifier {
     return directory.path;
   }
 
-  Future<File> get _localFile async {
-    final path = await _localPath;
-
-    return File('$path/savedata.txt');
-  }
-
   Future<void> readSave() async {}
 
   Future<void> writeSave() async {}
@@ -66,12 +61,43 @@ class MyAppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void testJson(gc.GoalClass goal) {
-    Map<String, dynamic> jsonGoal = goal.toJson();
-    log(jsonGoal.toString());
+  void testJson(gc.GoalClass goal) async {
+    String path = await _localPath;
+    FileIO reader = FileIO();
 
-    gc.GoalClass newgl = gc.GoalClass.fromJson(jsonGoal);
-    log(newgl.print());
+    reader.writeGoal(goal);
+    //goal.readGoal();
+
+    //log(Directory("$path").listSync().toString());
+    //goalList[]
+  }
+
+  Future<List<gc.GoalClass>?> readAddGoals() async {
+    String path = await _localPath;
+    List<gc.GoalClass> goalList = <gc.GoalClass>[];
+    FileIO reader = FileIO();
+
+    for (var file in Directory(path).listSync()) {
+      if (file.toString().contains(".txt")) {
+        log(file.toString());
+        String jsonContents = await reader.readGoal(File(file.path));
+        //log(jsonContents);
+        Map<String, dynamic> jsonGoal = jsonDecode(jsonContents);
+
+        ///log(jsonGoal["name"]);
+        //gc.GoalClass garbage = gc.GoalClass();
+        //String JSONString = garbage.readGoal() as String;
+        String begin = jsonGoal["begin"].toString().replaceAll(".", "-");
+        String end = jsonGoal["end"].toString().replaceAll(".", "-");
+        goalList.add(gc.GoalClass(DateTime.parse(begin), DateTime.parse(end),
+            jsonGoal["perc"], jsonGoal["name"]));
+
+        //goalList.add(gc.GoalClass(jsonGoal["begin"],
+        //    jsonGoal["end"], jsonGoal["perc"], jsonGoal["name"]));
+      }
+    }
+
+    return goalList;
   }
 
   void addGoal(gc.GoalClass goal) {
@@ -90,6 +116,11 @@ class _Tracker extends State<Tracker> {
   Widget build(BuildContext ctx) {
     Widget page;
     var appState = ctx.watch<MyAppState>();
+    appState.readAddGoals();
+
+    //Nickie insists this will fix all my problems;
+    //9u6
+
     //appState.pageIndex = appState.appBarIndex;
     switch (appState.pageIndex) {
       case 0:
