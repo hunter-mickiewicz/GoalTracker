@@ -11,12 +11,51 @@ import 'package:provider/provider.dart';
 import 'FileIO.dart';
 import 'GoalClass.dart' as gc;
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); //all widgets are rendered here
+  await readAddGoals();
   runApp(MyApp());
+}
+
+var goalList = <gc.GoalClass>[];
+
+Future<List<gc.GoalClass>?> readAddGoals() async {
+  String path = await _localPath;
+  FileIO reader = FileIO();
+
+  for (var file in Directory(path).listSync()) {
+    if (file.toString().contains(".txt")) {
+      log(file.toString());
+
+      String jsonContents = await reader.readGoal(File(file.path));
+
+      Map<String, dynamic> jsonGoal = jsonDecode(jsonContents);
+
+      String begin = jsonGoal["begin"].toString().replaceAll(".", "-");
+      String end = jsonGoal["end"].toString().replaceAll(".", "-");
+      log(begin + end + jsonGoal["percent"].toString() + jsonGoal["name"]);
+      goalList.add(gc.GoalClass(DateTime.parse(begin), DateTime.parse(end),
+          jsonGoal["percent"], jsonGoal["name"]));
+
+      log(goalList.length.toString());
+    }
+  }
+
+  return goalList;
+}
+
+Future<String> get _localPath async {
+  final directory = await getApplicationDocumentsDirectory();
+
+  return directory.path;
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+
+  void initState() {
+    //  readAddGoals();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,16 +75,6 @@ class MyApp extends StatelessWidget {
 }
 
 class MyAppState extends ChangeNotifier {
-  Future<String> get _localPath async {
-    final directory = await getApplicationDocumentsDirectory();
-
-    return directory.path;
-  }
-
-  Future<void> readSave() async {}
-
-  Future<void> writeSave() async {}
-
   var goalList = <gc.GoalClass>[];
   var currGoal;
   bool editingMode = false;
@@ -72,34 +101,6 @@ class MyAppState extends ChangeNotifier {
     //goalList[]
   }
 
-  Future<List<gc.GoalClass>?> readAddGoals() async {
-    String path = await _localPath;
-    List<gc.GoalClass> goalList = <gc.GoalClass>[];
-    FileIO reader = FileIO();
-
-    for (var file in Directory(path).listSync()) {
-      if (file.toString().contains(".txt")) {
-        log(file.toString());
-        String jsonContents = await reader.readGoal(File(file.path));
-        //log(jsonContents);
-        Map<String, dynamic> jsonGoal = jsonDecode(jsonContents);
-
-        ///log(jsonGoal["name"]);
-        //gc.GoalClass garbage = gc.GoalClass();
-        //String JSONString = garbage.readGoal() as String;
-        String begin = jsonGoal["begin"].toString().replaceAll(".", "-");
-        String end = jsonGoal["end"].toString().replaceAll(".", "-");
-        goalList.add(gc.GoalClass(DateTime.parse(begin), DateTime.parse(end),
-            jsonGoal["perc"], jsonGoal["name"]));
-
-        //goalList.add(gc.GoalClass(jsonGoal["begin"],
-        //    jsonGoal["end"], jsonGoal["perc"], jsonGoal["name"]));
-      }
-    }
-
-    return goalList;
-  }
-
   void addGoal(gc.GoalClass goal) {
     goalList.add(goal);
     notifyListeners();
@@ -113,10 +114,16 @@ class Tracker extends StatefulWidget {
 
 class _Tracker extends State<Tracker> {
   @override
+  void initState() {
+    //readAddGoals();
+  }
+
+  @override
   Widget build(BuildContext ctx) {
     Widget page;
     var appState = ctx.watch<MyAppState>();
-    appState.readAddGoals();
+    appState.goalList = goalList;
+    //appState.readAddGoals();
 
     //Nickie insists this will fix all my problems;
     //9u6
@@ -174,7 +181,8 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext ctx) {
     var appState = ctx.watch<MyAppState>();
-    var goals = appState.goalList;
+    var goals = goalList;
+    log(goalList.length.toString());
     var msg = '';
 
     if (goals.isEmpty) {
@@ -198,7 +206,7 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: FloatingActionButton(onPressed: () {
         appState.addTestGoal();
-        appState.testJson(appState.goalList[0]);
+        //appState.testJson(appState.goalList[0]);
       }),
     );
   }

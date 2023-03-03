@@ -28,7 +28,7 @@ class GoalClass {
   }
 
   String dataDate(DateTime dt) {
-    return "${dt.month}-${dt.day}-${dt.year}";
+    return "${dt.year}-${dt.month.toString().length >= 2 ? dt.month : "0${dt.month}"}-${dt.day.toString().length >= 2 ? dt.day : "0${dt.day}"}";
   }
 
   String createFileName(String name, DateTime date) {

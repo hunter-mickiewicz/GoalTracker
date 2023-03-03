@@ -58,8 +58,8 @@ main() {
       Map<String, dynamic> testJson = goal.toJson();
       expect(testJson['name'], 'update');
       expect(testJson['percent'], 0.4);
-      expect(testJson['begin'], DateTime(2023));
-      expect(testJson['end'], DateTime(2024));
+      expect(testJson['begin'], "2023-01-01");
+      expect(testJson['end'], "2024-01-01");
       expect(testJson['milestones']['1/1/2022'],
           ['milestone test', 'second test']);
       //expect(goal.toJson(),
