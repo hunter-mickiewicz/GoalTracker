@@ -22,7 +22,7 @@ class FileIO {
 
   Future<File> writeGoal(GoalClass goal) async {
     final file = await _localFile(goal);
-    //log(file.toString());
+
     Map<String, dynamic> JSONContent = goal.toJson();
 
     return file.writeAsString(jsonEncode(JSONContent));
@@ -36,5 +36,11 @@ class FileIO {
     } catch (error) {
       return "";
     }
+  }
+
+  void delete(GoalClass goal) async {
+    File file = await _localFile(goal);
+    log(file.toString());
+    file.delete();
   }
 }

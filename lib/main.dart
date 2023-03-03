@@ -82,12 +82,14 @@ class MyAppState extends ChangeNotifier {
   var appBarIndex = 0;
   var pageIndex = 0;
 
-  void addTestGoal() {
-    goalList.add(
-        gc.GoalClass(DateTime.now(), DateTime.utc(2023, 12, 31), 0.69, "test"));
+  gc.GoalClass addTestGoal() {
+    gc.GoalClass goal =
+        gc.GoalClass(DateTime.now(), DateTime.utc(2023, 12, 31), 0.69, "test");
+    goalList.add(goal);
     goalList[0].updateMilestones(DateTime.now(), "test milestone");
 
     notifyListeners();
+    return goal;
   }
 
   void testJson(gc.GoalClass goal) async {
@@ -205,7 +207,10 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(onPressed: () {
-        appState.addTestGoal();
+        FileIO writer = FileIO();
+        gc.GoalClass goal = appState.addTestGoal();
+        writer.writeGoal(goal);
+
         //appState.testJson(appState.goalList[0]);
       }),
     );
@@ -487,6 +492,8 @@ class _GoalEditPageState extends State<GoalEditPage> {
       )) {
         case 0:
           setState(() {
+            FileIO deleter = FileIO();
+            deleter.delete(appState.currGoal);
             appState.goalList.remove(appState.currGoal);
             appState.notifyListeners();
           });
