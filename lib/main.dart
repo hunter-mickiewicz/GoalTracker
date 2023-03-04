@@ -3,7 +3,7 @@ import 'dart:convert';
 // ignore: unused_import
 import 'dart:developer';
 import 'dart:io';
-
+import 'local_notice_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:percent_indicator/percent_indicator.dart' as perc;
 import 'package:flutter/material.dart';
@@ -14,6 +14,7 @@ import 'GoalClass.dart' as gc;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); //all widgets are rendered here
   await readAddGoals();
+  await LocalNoticeService().setup();
   runApp(MyApp());
 }
 
@@ -52,10 +53,6 @@ Future<String> get _localPath async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  void initState() {
-    //  readAddGoals();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -209,6 +206,13 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: FloatingActionButton(onPressed: () {
         FileIO writer = FileIO();
         gc.GoalClass goal = appState.addTestGoal();
+        LocalNoticeService().addNotification(
+          'Notification Title',
+          'Notification Body',
+          DateTime.now().millisecondsSinceEpoch + 1000,
+          channel: 'testing',
+        );
+        log(DateTime.now().toString());
         writer.writeGoal(goal);
 
         //appState.testJson(appState.goalList[0]);
