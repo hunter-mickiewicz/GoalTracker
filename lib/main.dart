@@ -26,19 +26,18 @@ Future<List<gc.GoalClass>?> readAddGoals() async {
 
   for (var file in Directory(path).listSync()) {
     if (file.toString().contains(".txt")) {
-      log(file.toString());
-
       String jsonContents = await reader.readGoal(File(file.path));
 
-      Map<String, dynamic> jsonGoal = jsonDecode(jsonContents);
+      if (jsonContents.length != 0) {
+        Map<String, dynamic> jsonGoal = jsonDecode(jsonContents);
 
-      String begin = jsonGoal["begin"].toString().replaceAll(".", "-");
-      String end = jsonGoal["end"].toString().replaceAll(".", "-");
-      log(begin + end + jsonGoal["percent"].toString() + jsonGoal["name"]);
-      goalList.add(gc.GoalClass(DateTime.parse(begin), DateTime.parse(end),
-          jsonGoal["percent"], jsonGoal["name"]));
-
-      log(goalList.length.toString());
+        String begin = jsonGoal["begin"].toString().replaceAll(".", "-");
+        String end = jsonGoal["end"].toString().replaceAll(".", "-");
+        goalList.add(gc.GoalClass(DateTime.parse(begin), DateTime.parse(end),
+            jsonGoal["percent"], jsonGoal["name"]));
+      } else {
+        file.delete();
+      }
     }
   }
 
@@ -209,7 +208,7 @@ class _HomePageState extends State<HomePage> {
         LocalNoticeService().addNotification(
           'Notification Title',
           'Notification Body',
-          DateTime.now().millisecondsSinceEpoch + 1000,
+          DateTime.now().millisecondsSinceEpoch + 500,
           channel: 'testing',
         );
         log(DateTime.now().toString());
@@ -497,6 +496,7 @@ class _GoalEditPageState extends State<GoalEditPage> {
         case 0:
           setState(() {
             FileIO deleter = FileIO();
+
             deleter.delete(appState.currGoal);
             appState.goalList.remove(appState.currGoal);
             appState.notifyListeners();

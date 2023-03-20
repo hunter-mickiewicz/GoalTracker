@@ -40,14 +40,12 @@ main() {
     });
 
     test('Milestones on the same date are properly added and hashable', () {
-      //goal.updateMilestones(DateTime(2022), "milestone test");
       goal.updateMilestones(DateTime(2022), "second test");
       expect(goal.milestones.length, 1);
       expect(goal.milestones[goal.usableDate(DateTime(2022))]!.length, 2);
       expect(
           goal.milestones[goal.usableDate(DateTime(2022))]![1], "second test");
     });
-    //milestone on same date
 
     test('GetStringPercent returns the proper percentage as a string', () {
       expect(goal.getStringPercent(), '40.0');
@@ -62,8 +60,6 @@ main() {
       expect(testJson['end'], "2024-01-01");
       expect(testJson['milestones']['1/1/2022'],
           ['milestone test', 'second test']);
-      //expect(goal.toJson(),
-      //    "'name': 'update','percent': 0.4,'begin': DateTime:2023-01-01 00:00:00.000,'end': DateTime:2024-01-01 00:00:00.000,'milestones': {'1/1/2022': ['milestone test', 'second test']}");
     });
   });
 }
