@@ -3,6 +3,8 @@ import 'dart:convert';
 // ignore: unused_import
 import 'dart:developer';
 import 'dart:io';
+import 'package:goal_tracker/settings.dart';
+
 import 'local_notice_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:percent_indicator/percent_indicator.dart' as perc;
@@ -19,26 +21,46 @@ void main() async {
 }
 
 var goalList = <gc.GoalClass>[];
+//There will be one Settings object per app.
+Settings? settings;
 
 Future<List<gc.GoalClass>?> readAddGoals() async {
-  String path = await _localPath;
   FileIO reader = FileIO();
 
-  for (var file in Directory(path).listSync()) {
-    if (file.toString().contains(".txt")) {
-      String jsonContents = await reader.readGoal(File(file.path));
+  void readInGoal(File file) async {
+    String jsonContents = await reader.readInput(File(file.path));
 
-      if (jsonContents.length != 0) {
-        Map<String, dynamic> jsonGoal = jsonDecode(jsonContents);
+    if (jsonContents.length != 0) {
+      Map<String, dynamic> jsonGoal = jsonDecode(jsonContents);
 
-        String begin = jsonGoal["begin"].toString().replaceAll(".", "-");
-        String end = jsonGoal["end"].toString().replaceAll(".", "-");
-        goalList.add(gc.GoalClass(DateTime.parse(begin), DateTime.parse(end),
-            jsonGoal["percent"], jsonGoal["name"]));
-      } else {
-        file.delete();
-      }
+      String begin = jsonGoal["begin"].toString().replaceAll(".", "-");
+      String end = jsonGoal["end"].toString().replaceAll(".", "-");
+      goalList.add(gc.GoalClass(DateTime.parse(begin), DateTime.parse(end),
+          jsonGoal["percent"], jsonGoal["name"]));
+    } else {
+      file.delete();
     }
+  }
+
+  String path = await _localPath;
+
+  for (var file in Directory(path).listSync()) {
+    if (file.toString().contains("settings.txt")) {
+      //reads in the settings file, decodes as JSON
+      String settingsString = await reader.readInput(File(file.path));
+      var decoded = json.decode(settingsString);
+
+      settings = Settings.json(decoded);
+
+      //further logic for settings...
+    } else if (file.toString().contains(".txt")) {
+      readInGoal(File(file.path));
+    }
+  }
+  if (settings == null) {
+    log("No settings found! :(");
+    settings = Settings.def();
+    reader.writeSettings(settings!);
   }
 
   return goalList;
@@ -180,7 +202,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext ctx) {
     var appState = ctx.watch<MyAppState>();
     var goals = goalList;
-    log(goalList.length.toString());
+
     var msg = '';
 
     if (goals.isEmpty) {
@@ -208,10 +230,11 @@ class _HomePageState extends State<HomePage> {
         LocalNoticeService().addNotification(
           'Notification Title',
           'Notification Body',
-          DateTime.now().millisecondsSinceEpoch + 500,
+          DateTime.now().millisecondsSinceEpoch + 15000,
+          //The minimum time here seems to be 5 seconds afterward (5000)
+          //Works even if the app is closed.
           channel: 'testing',
         );
-        log(DateTime.now().toString());
         writer.writeGoal(goal);
 
         //appState.testJson(appState.goalList[0]);

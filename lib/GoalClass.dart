@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 import 'dart:convert';
 
+import 'package:goal_tracker/settings.dart';
 import 'package:path_provider/path_provider.dart';
 
 // ignore: file_names
