@@ -23,6 +23,7 @@ void main() async {
 var goalList = <gc.GoalClass>[];
 //There will be one Settings object per app.
 Settings? settings;
+bool firstTimeFlag = false;
 
 Future<List<gc.GoalClass>?> readAddGoals() async {
   FileIO reader = FileIO();
@@ -61,6 +62,7 @@ Future<List<gc.GoalClass>?> readAddGoals() async {
     log("No settings found! :(");
     settings = Settings.def();
     reader.writeSettings(settings!);
+    firstTimeFlag = true;
   }
 
   return goalList;
@@ -153,8 +155,8 @@ class _Tracker extends State<Tracker> {
       case 0:
         page = HomePage();
         break;
-      case 2:
-        page = Placeholder();
+      case 1:
+        page = SettingsPage();
         break;
       default:
         page = Placeholder();
@@ -230,7 +232,7 @@ class _HomePageState extends State<HomePage> {
         LocalNoticeService().addNotification(
           'Notification Title',
           'Notification Body',
-          DateTime.now().millisecondsSinceEpoch + 15000,
+          DateTime.now().millisecondsSinceEpoch + 5000,
           //The minimum time here seems to be 5 seconds afterward (5000)
           //Works even if the app is closed.
           channel: 'testing',
@@ -240,6 +242,25 @@ class _HomePageState extends State<HomePage> {
         //appState.testJson(appState.goalList[0]);
       }),
     );
+  }
+}
+
+class SettingsPage extends StatefulWidget {
+  @override
+  State<SettingsPage> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        body: ListView(
+      children: [
+        Text("App Settings"),
+        Text("Contact Us"),
+        Text("About"),
+      ],
+    ));
   }
 }
 
