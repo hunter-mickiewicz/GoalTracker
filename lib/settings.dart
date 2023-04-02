@@ -17,6 +17,10 @@ class Settings {
     recurringTime = j['recurringTime'];
   }
 
+  int getRecurringTime() {
+    return recurringTime;
+  }
+
   Map<String, dynamic> toJson() => {
         'recurringTime': recurringTime,
       };

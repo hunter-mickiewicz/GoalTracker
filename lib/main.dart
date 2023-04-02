@@ -256,11 +256,39 @@ class _SettingsPageState extends State<SettingsPage> {
     return Scaffold(
         body: ListView(
       children: [
-        Text("App Settings"),
-        Text("Contact Us"),
-        Text("About"),
+        ListTile(
+          title: Text("Notification Rate"),
+          subtitle: Text(settings!.getRecurringTime().toString()),
+          onTap: () async {
+            showDialog(
+                context: context,
+                builder: (BuildContext context) =>
+                    Dialog(child: Text("testing...")));
+          },
+        ),
+        Divider(),
+        ListTile(title: Text("Contact Us")),
+        Divider(),
+        ListTile(title: Text("About")),
       ],
     ));
+  }
+}
+
+class AdjustSettings extends StatefulWidget {
+  @override
+  State<AdjustSettings> createState() => _AdjustSettings();
+}
+
+class _AdjustSettings extends State<AdjustSettings> {
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return Dialog(
+      child: Text("test"),
+    );
+
+    //return Scaffold(body: Text("testing..."),);
   }
 }
 
