@@ -31,7 +31,7 @@ Future<List<gc.GoalClass>?> readAddGoals() async {
   void readInGoal(File file) async {
     String jsonContents = await reader.readInput(File(file.path));
 
-    if (jsonContents.length != 0) {
+    if (jsonContents.isNotEmpty) {
       Map<String, dynamic> jsonGoal = jsonDecode(jsonContents);
 
       String begin = jsonGoal["begin"].toString().replaceAll(".", "-");
@@ -52,6 +52,7 @@ Future<List<gc.GoalClass>?> readAddGoals() async {
       var decoded = json.decode(settingsString);
 
       settings = Settings.json(decoded);
+      log("settingsfound");
 
       //further logic for settings...
     } else if (file.toString().contains(".txt")) {
@@ -232,7 +233,8 @@ class _HomePageState extends State<HomePage> {
         LocalNoticeService().addNotification(
           'Notification Title',
           'Notification Body',
-          DateTime.now().millisecondsSinceEpoch + 5000,
+          DateTime.now().millisecondsSinceEpoch +
+              (settings!.getRecurringTime() * 5000),
           //The minimum time here seems to be 5 seconds afterward (5000)
           //Works even if the app is closed.
           channel: 'testing',
@@ -251,6 +253,29 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  void updateSettings(int setting, int val) async {
+    String path = await _localPath;
+    //File? settingsFile;
+    FileIO writer = new FileIO();
+
+    /*for (var file in Directory(path).listSync()) {
+      if (file.toString().contains("settings.txt")) {
+        settingsFile = file as File?;
+      }
+    }*/
+
+    switch (setting) {
+      case 0:
+        settings!.recurringTime = val;
+        setState(() {
+          writer.writeSettings(settings!);
+        });
+        break;
+      default:
+        throw UnimplementedError();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -258,12 +283,25 @@ class _SettingsPageState extends State<SettingsPage> {
       children: [
         ListTile(
           title: Text("Notification Rate"),
-          subtitle: Text(settings!.getRecurringTime().toString()),
+          subtitle: Text("${settings!.getRecurringTime() * 5} Seconds"),
           onTap: () async {
             showDialog(
                 context: context,
-                builder: (BuildContext context) =>
-                    Dialog(child: Text("testing...")));
+                builder: (BuildContext context) => Dialog(
+                        child: TextField(
+                      keyboardType: TextInputType.number,
+                      textAlign: TextAlign.center,
+                      decoration: InputDecoration(
+                          border: InputBorder.none,
+                          labelText: "Number of hours between notifications",
+                          floatingLabelAlignment:
+                              FloatingLabelAlignment.center),
+                      onSubmitted: (value) {
+                        //TODO: need error checking here
+                        updateSettings(0, int.parse(value));
+                        log("submitted");
+                      },
+                    )));
           },
         ),
         Divider(),
