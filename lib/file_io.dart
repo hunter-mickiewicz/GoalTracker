@@ -1,13 +1,13 @@
+// ignore: file_names
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-
-import 'package:goal_tracker/GoalClass.dart';
+import 'package:goal_tracker/goal_class.dart';
 import 'package:goal_tracker/settings.dart';
 import 'package:path_provider/path_provider.dart';
 
 class FileIO {
-  FileIO() {}
+  FileIO();
 
   Future<String> get _localPath async {
     final directory = await getApplicationDocumentsDirectory();
@@ -29,16 +29,16 @@ class FileIO {
   Future<File> writeGoal(GoalClass goal) async {
     final file = await _localFile(goal);
 
-    Map<String, dynamic> JSONContent = goal.toJson();
+    Map<String, dynamic> jsonContent = goal.toJson();
 
-    return file.writeAsString(jsonEncode(JSONContent));
+    return file.writeAsString(jsonEncode(jsonContent));
   }
 
   Future<File> writeSettings(Settings settings) async {
     final file = await _localSettings();
 
-    Map<String, dynamic> JSONContent = settings.toJson();
-    return file.writeAsString(jsonEncode(JSONContent));
+    Map<String, dynamic> jsonContent = settings.toJson();
+    return file.writeAsString(jsonEncode(jsonContent));
   }
 
   Future<String> readInput(File file) async {

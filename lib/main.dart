@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'dart:collection';
 import 'dart:convert';
 // ignore: unused_import
@@ -9,8 +11,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:percent_indicator/percent_indicator.dart' as perc;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'FileIO.dart';
-import 'GoalClass.dart' as gc;
+import 'file_io.dart';
+import 'goal_class.dart' as gc;
 import 'package:awesome_notifications/awesome_notifications.dart';
 
 void main() async {
@@ -143,7 +145,6 @@ class MyApp extends StatelessWidget {
   static final GlobalKey<NavigatorState> navigatorKey =
       GlobalKey<NavigatorState>();
 
-  @override
   void initState() {
     // Only after at least the action method is set, the notification events are delivered
     AwesomeNotifications().setListeners(
@@ -177,6 +178,7 @@ class MyApp extends StatelessWidget {
 
 class MyAppState extends ChangeNotifier {
   var goalList = <gc.GoalClass>[];
+  // ignore: prefer_typing_uninitialized_variables
   var currGoal;
   bool editingMode = false;
 
@@ -194,7 +196,6 @@ class MyAppState extends ChangeNotifier {
   }
 
   void testJson(gc.GoalClass goal) async {
-    String path = await _localPath;
     FileIO reader = FileIO();
 
     reader.writeGoal(goal);
@@ -212,11 +213,6 @@ class Tracker extends StatefulWidget {
 }
 
 class _Tracker extends State<Tracker> {
-  @override
-  void initState() {
-    //readAddGoals();
-  }
-
   @override
   Widget build(BuildContext ctx) {
     Widget page;
@@ -328,15 +324,7 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   void updateSettings(int setting, int val) async {
-    String path = await _localPath;
-    //File? settingsFile;
-    FileIO writer = new FileIO();
-
-    /*for (var file in Directory(path).listSync()) {
-      if (file.toString().contains("settings.txt")) {
-        settingsFile = file as File?;
-      }
-    }*/
+    FileIO writer = FileIO();
 
     switch (setting) {
       case 0:
@@ -423,7 +411,6 @@ class GoalDisplay extends StatelessWidget {
       appState.goalList.remove(appState.currGoal);
       if (appState.currGoal != null) {
         appState.goalList.add(appState.currGoal);
-        appState.notifyListeners();
       }
     }
 
@@ -538,7 +525,7 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
       }
     }
 
-    void _checkReady() {
+    void checkReady() {
       if (appState.editingMode ||
           (begin != null &&
               end != null &&
@@ -566,7 +553,7 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
             onChanged: (text) {
               setState(() {
                 goalName = text;
-                _checkReady();
+                checkReady();
               });
             },
           ),
@@ -576,7 +563,7 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
               onPressed: () {
                 setState(() {
                   _beginDateSelection();
-                  _checkReady();
+                  checkReady();
                 });
               },
               child: Text(beginString),
@@ -585,7 +572,7 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
                 onPressed: () {
                   setState(() {
                     _endDateSelection();
-                    _checkReady();
+                    checkReady();
                   });
                 },
                 child: Text(endString)),
@@ -602,7 +589,7 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
             onChanged: (text) {
               setState(() {
                 percent = double.tryParse(text);
-                _checkReady();
+                checkReady();
               });
             },
           ),
@@ -682,7 +669,6 @@ class _GoalEditPageState extends State<GoalEditPage> {
 
             deleter.delete(appState.currGoal);
             appState.goalList.remove(appState.currGoal);
-            appState.notifyListeners();
           });
           Navigator.pop(context);
           appState.currGoal = null;
@@ -794,7 +780,7 @@ class _AddMilestonePageState extends State<AddMilestonePage> {
   @override
   Widget build(BuildContext ctx) {
     var appState = ctx.watch<MyAppState>();
-    Future<void> _addMilestoneDate() async {
+    Future<void> addMilestoneDate() async {
       milestoneDate = await showDatePicker(
           context: context,
           initialDate: DateTime.now(),
@@ -815,7 +801,7 @@ class _AddMilestonePageState extends State<AddMilestonePage> {
       appState.currGoal.updatePercentage(perc);
     }
 
-    void _checkBools() {
+    void checkBools() {
       if (dateBool && textBool) {
         confirmBool = true;
       }
@@ -828,7 +814,7 @@ class _AddMilestonePageState extends State<AddMilestonePage> {
             OutlinedButton(
               onPressed: () {
                 setState(() {
-                  _addMilestoneDate();
+                  addMilestoneDate();
                 });
               },
               child: Text(milestoneDateString),
@@ -850,7 +836,7 @@ class _AddMilestonePageState extends State<AddMilestonePage> {
                       setState(() {
                         milestone = text;
                         textBool = true;
-                        _checkBools();
+                        checkBools();
                       });
                     },
                   ),
