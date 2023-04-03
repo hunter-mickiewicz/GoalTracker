@@ -1,11 +1,3 @@
-import 'dart:developer';
-import 'dart:io';
-
-import 'package:goal_tracker/GoalClass.dart';
-import 'package:test/test.dart';
-
-import 'FileIO.dart';
-
 class Settings {
   late int recurringTime;
 

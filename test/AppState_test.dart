@@ -1,18 +1,15 @@
-import 'dart:convert';
-import 'dart:developer';
-import 'dart:io';
+// ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:goal_tracker/FileIO.dart';
-import 'package:goal_tracker/GoalClass.dart';
+//import 'package:goal_tracker/file_io.dart';
+import 'package:goal_tracker/goal_class.dart';
 import 'package:goal_tracker/main.dart';
-import 'package:path_provider/path_provider.dart';
 
 void main() {
   final appState = MyAppState();
   final goal = GoalClass(DateTime(2022), DateTime(2023), 12, 'test');
-  FileIO fileDoodad = FileIO();
+  //FileIO fileDoodad = FileIO();
   testWidgets('AppState goal list should add item properly', (tester) async {
     await tester.pumpWidget(MaterialApp(
         home: Scaffold(

@@ -1,9 +1,9 @@
-// ignore_for_file: unused_import
+// ignore_for_file: unused_import, file_names
 
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:goal_tracker/GoalClass.dart';
+import 'package:goal_tracker/goal_class.dart';
 import 'package:test/test.dart';
 
 main() {
