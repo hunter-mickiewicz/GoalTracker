@@ -5,19 +5,83 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:goal_tracker/settings.dart';
 
-import 'local_notice_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:percent_indicator/percent_indicator.dart' as perc;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'FileIO.dart';
 import 'GoalClass.dart' as gc;
+import 'package:awesome_notifications/awesome_notifications.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); //all widgets are rendered here
   await readAddGoals();
-  await LocalNoticeService().setup();
+  AwesomeNotifications().initialize(
+      // set the icon to null if you want to use the default app icon
+      // //drawable/res_app_icon for a custom icon
+      'resource://drawable/notification',
+      [
+        NotificationChannel(
+            channelGroupKey: 'basic_channel_group',
+            channelKey: 'basic_channel',
+            channelName: 'Basic notifications',
+            channelDescription: 'Notification channel for basic tests',
+            defaultColor: Color(0xFF9D50DD),
+            ledColor: Colors.white)
+      ],
+      // Channel groups are only visual and are not required
+      channelGroups: [
+        NotificationChannelGroup(
+            channelGroupKey: 'basic_channel_group',
+            channelGroupName: 'Basic group')
+      ],
+      debug: true);
+  AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
+    if (!isAllowed) {
+      // This is just a basic example. For real apps, you must show some
+      // friendly dialog box before call the request method.
+      // This is very important to not harm the user experience
+      AwesomeNotifications().requestPermissionToSendNotifications();
+    }
+  });
   runApp(MyApp());
+}
+
+class NotificationController {
+  /// Use this method to detect when a new notification or a schedule is created
+  @pragma("vm:entry-point")
+  static Future<void> onNotificationCreatedMethod(
+      ReceivedNotification receivedNotification) async {
+    // Your code goes here
+  }
+
+  /// Use this method to detect every time that a new notification is displayed
+  @pragma("vm:entry-point")
+  static Future<void> onNotificationDisplayedMethod(
+      ReceivedNotification receivedNotification) async {
+    // Your code goes here
+  }
+
+  /// Use this method to detect if the user dismissed a notification
+  @pragma("vm:entry-point")
+  static Future<void> onDismissActionReceivedMethod(
+      ReceivedAction receivedAction) async {
+    // Your code goes here
+  }
+
+  /// Use this method to detect when the user taps on a notification or action button
+  @pragma("vm:entry-point")
+  static Future<void> onActionReceivedMethod(
+      ReceivedAction receivedAction) async {
+    // Your code goes here
+
+    // Navigate into pages, avoiding to open the notification details page over another details page already opened
+    MyApp.navigatorKey.currentState?.pushNamedAndRemoveUntil(
+        '/notification-page',
+        (route) =>
+            (route.settings.name != '/notification-page') || route.isFirst,
+        arguments: receivedAction);
+  }
 }
 
 var goalList = <gc.GoalClass>[];
@@ -52,7 +116,6 @@ Future<List<gc.GoalClass>?> readAddGoals() async {
       var decoded = json.decode(settingsString);
 
       settings = Settings.json(decoded);
-      log("settingsfound");
 
       //further logic for settings...
     } else if (file.toString().contains(".txt")) {
@@ -77,21 +140,38 @@ Future<String> get _localPath async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
+
+  @override
+  void initState() {
+    // Only after at least the action method is set, the notification events are delivered
+    AwesomeNotifications().setListeners(
+        onActionReceivedMethod: NotificationController.onActionReceivedMethod,
+        onNotificationCreatedMethod:
+            NotificationController.onNotificationCreatedMethod,
+        onNotificationDisplayedMethod:
+            NotificationController.onNotificationDisplayedMethod,
+        onDismissActionReceivedMethod:
+            NotificationController.onDismissActionReceivedMethod);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => MyAppState(),
-      child: MaterialApp(
-        title: 'Goal Tracker',
-        theme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(
-              seedColor: Color.fromARGB(255, 194, 11, 118)),
-        ),
-        home: Tracker(),
-      ),
-    );
+    return MaterialApp(
+        navigatorKey: MyApp.navigatorKey,
+        home: ChangeNotifierProvider(
+          create: (context) => MyAppState(),
+          child: MaterialApp(
+            title: 'Goal Tracker',
+            theme: ThemeData(
+              useMaterial3: true,
+              colorScheme: ColorScheme.fromSeed(
+                  seedColor: Color.fromARGB(255, 194, 11, 118)),
+            ),
+            home: Tracker(),
+          ),
+        ));
   }
 }
 
@@ -118,10 +198,6 @@ class MyAppState extends ChangeNotifier {
     FileIO reader = FileIO();
 
     reader.writeGoal(goal);
-    //goal.readGoal();
-
-    //log(Directory("$path").listSync().toString());
-    //goalList[]
   }
 
   void addGoal(gc.GoalClass goal) {
@@ -230,15 +306,13 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: FloatingActionButton(onPressed: () {
         FileIO writer = FileIO();
         gc.GoalClass goal = appState.addTestGoal();
-        LocalNoticeService().addNotification(
-          'Notification Title',
-          'Notification Body',
-          DateTime.now().millisecondsSinceEpoch +
-              (settings!.getRecurringTime() * 5000),
-          //The minimum time here seems to be 5 seconds afterward (5000)
-          //Works even if the app is closed.
-          channel: 'testing',
-        );
+        AwesomeNotifications().createNotification(
+            content: NotificationContent(
+                id: 10,
+                channelKey: 'basic_channel',
+                title: 'Simple Notification',
+                body: 'Simple body',
+                actionType: ActionType.Default));
         writer.writeGoal(goal);
 
         //appState.testJson(appState.goalList[0]);
@@ -299,7 +373,6 @@ class _SettingsPageState extends State<SettingsPage> {
                       onSubmitted: (value) {
                         //TODO: need error checking here
                         updateSettings(0, int.parse(value));
-                        log("submitted");
                       },
                     )));
           },
