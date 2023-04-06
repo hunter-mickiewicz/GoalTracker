@@ -308,10 +308,11 @@ class _HomePageState extends State<HomePage> {
                 channelKey: 'basic_channel',
                 title: 'Simple Notification',
                 body: 'Simple body',
-                actionType: ActionType.Default));
+                actionType: ActionType.Default),
+            //Interval value doesn't seem to matter. Calendar works, afaik
+            schedule: NotificationInterval(interval: 60000, repeats: true));
+        //schedule: NotificationCalendar(second: 0, repeats: true));
         writer.writeGoal(goal);
-
-        //appState.testJson(appState.goalList[0]);
       }),
     );
   }
@@ -360,6 +361,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               FloatingLabelAlignment.center),
                       onSubmitted: (value) {
                         //TODO: need error checking here
+                        //AwesomeNotifications().createNotification(content: NotificationContent(id: id, channelKey: channelKey), schedule: NotificationInterval(interval: ))
                         updateSettings(0, int.parse(value));
                       },
                     )));
@@ -371,23 +373,6 @@ class _SettingsPageState extends State<SettingsPage> {
         ListTile(title: Text("About")),
       ],
     ));
-  }
-}
-
-class AdjustSettings extends StatefulWidget {
-  @override
-  State<AdjustSettings> createState() => _AdjustSettings();
-}
-
-class _AdjustSettings extends State<AdjustSettings> {
-  @override
-  Widget build(BuildContext context) {
-    // TODO: implement build
-    return Dialog(
-      child: Text("test"),
-    );
-
-    //return Scaffold(body: Text("testing..."),);
   }
 }
 
