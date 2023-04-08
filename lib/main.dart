@@ -346,6 +346,15 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    void sendEmail(String type) async {
+      Email email = Email(
+        subject: "Goal Tracker: $type",
+        recipients: ["agreenstormproject@gmail.com"],
+        body: "",
+      );
+      await FlutterEmailSender.send(email);
+    }
+
     return Scaffold(
         body: ListView(
       children: [
@@ -383,12 +392,38 @@ class _SettingsPageState extends State<SettingsPage> {
         ListTile(
           title: Text("Contact Us"),
           onTap: () async {
-            Email email = Email(
-              subject: "test",
-              recipients: ["agreenstormproject@gmail.com"],
-              body: "this is a test email",
-            );
-            await FlutterEmailSender.send(email);
+            showDialog(
+                context: context,
+                builder: (BuildContext context) => Dialog(
+                      child: ListView(
+                        shrinkWrap: true,
+                        children: [
+                          Text(
+                            "What type of feedback do you have?",
+                            style: TextStyle(fontSize: 24),
+                            textAlign: TextAlign.center,
+                          ),
+                          ListTile(
+                            title: Text("Bug Report"),
+                            onTap: () {
+                              sendEmail("Bug Report");
+                            },
+                          ),
+                          ListTile(
+                            title: Text("Feature Request"),
+                            onTap: () {
+                              sendEmail("Feature Request");
+                            },
+                          ),
+                          ListTile(
+                            title: Text("Other Comment"),
+                            onTap: () {
+                              sendEmail("Other Comment");
+                            },
+                          ),
+                        ],
+                      ),
+                    ));
           },
         ),
         Divider(),
