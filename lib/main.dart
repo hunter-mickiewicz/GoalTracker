@@ -368,6 +368,13 @@ class _SettingsPageState extends State<SettingsPage> {
           },
         ),
         Divider(),
+        ListTile(
+          title: Text("Cancel Notifications"),
+          onTap: () {
+            AwesomeNotifications().cancelAll();
+          },
+        ),
+        Divider(),
         ListTile(title: Text("Contact Us")),
         Divider(),
         ListTile(title: Text("About")),
