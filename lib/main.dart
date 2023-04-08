@@ -11,10 +11,13 @@ import 'package:path_provider/path_provider.dart';
 import 'package:percent_indicator/percent_indicator.dart' as perc;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:timezone/timezone.dart';
 import 'file_io.dart';
 import 'goal_class.dart' as gc;
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:flutter_email_sender/flutter_email_sender.dart';
 
+String localTimeZone = "";
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); //all widgets are rendered here
   await readAddGoals();
@@ -46,6 +49,7 @@ void main() async {
       AwesomeNotifications().requestPermissionToSendNotifications();
     }
   });
+  localTimeZone = await AwesomeNotifications().getLocalTimeZoneIdentifier();
   runApp(MyApp());
 }
 
@@ -310,8 +314,9 @@ class _HomePageState extends State<HomePage> {
                 body: 'Simple body',
                 actionType: ActionType.Default),
             //Interval value doesn't seem to matter. Calendar works, afaik
-            schedule: NotificationInterval(interval: 60000, repeats: true));
-        //schedule: NotificationCalendar(second: 0, repeats: true));
+            //schedule: NotificationInterval(interval: 60000, timeZone: localTimeZone, repeats: true));
+            schedule: NotificationCalendar(
+                second: 0, minute: 51, hour: 9, repeats: true));
         writer.writeGoal(goal);
       }),
     );
@@ -375,7 +380,17 @@ class _SettingsPageState extends State<SettingsPage> {
           },
         ),
         Divider(),
-        ListTile(title: Text("Contact Us")),
+        ListTile(
+          title: Text("Contact Us"),
+          onTap: () async {
+            Email email = Email(
+              subject: "test",
+              recipients: ["agreenstormproject@gmail.com"],
+              body: "this is a test email",
+            );
+            await FlutterEmailSender.send(email);
+          },
+        ),
         Divider(),
         ListTile(title: Text("About")),
       ],

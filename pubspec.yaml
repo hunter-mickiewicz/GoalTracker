@@ -11,6 +11,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_email_sender: any
   shared_preferences: ^2.0.18
   awesome_notifications: any
   flutter_local_notifications: ^13.0.0
