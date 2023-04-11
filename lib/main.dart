@@ -107,7 +107,7 @@ Future<List<gc.GoalClass>?> readAddGoals() async {
       String begin = jsonGoal["begin"].toString().replaceAll(".", "-");
       String end = jsonGoal["end"].toString().replaceAll(".", "-");
       goalList.add(gc.GoalClass(DateTime.parse(begin), DateTime.parse(end),
-          jsonGoal["percent"], jsonGoal["name"]));
+          jsonGoal["percent"], jsonGoal["name"], jsonGoal['notification']));
     } else {
       file.delete();
     }
@@ -189,8 +189,8 @@ class MyAppState extends ChangeNotifier {
   var pageIndex = 0;
 
   gc.GoalClass addTestGoal() {
-    gc.GoalClass goal =
-        gc.GoalClass(DateTime.now(), DateTime.utc(2023, 12, 31), 0.69, "test");
+    gc.GoalClass goal = gc.GoalClass(
+        DateTime.now(), DateTime.utc(2023, 12, 31), 0.69, "test", "");
     goalList.add(goal);
     goalList[0].updateMilestones(DateTime.now(), "test milestone");
 
@@ -205,7 +205,18 @@ class MyAppState extends ChangeNotifier {
   }
 
   void addGoal(gc.GoalClass goal) {
+    FileIO writer = FileIO();
     goalList.add(goal);
+    writer.writeGoal(goal);
+
+    notifyListeners();
+  }
+
+  void removeGoal(gc.GoalClass goal) {
+    FileIO deleter = FileIO();
+    deleter.delete(currGoal);
+    goalList.remove(goal);
+
     notifyListeners();
   }
 }
@@ -303,20 +314,24 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(onPressed: () {
-        FileIO writer = FileIO();
-        gc.GoalClass goal = appState.addTestGoal();
-        AwesomeNotifications().createNotification(
+        //gc.GoalClass goal = appState.addTestGoal();
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => GoalCreatorPage()),
+        );
+
+        //TEST schedule, add goal
+        /*AwesomeNotifications().createNotification(
             content: NotificationContent(
                 id: 10,
                 channelKey: 'basic_channel',
                 title: 'Simple Notification',
                 body: 'Simple body',
                 actionType: ActionType.Default),
-            //Interval value doesn't seem to matter. Calendar works, afaik
-            //schedule: NotificationInterval(interval: 60000, timeZone: localTimeZone, repeats: true));
             schedule: NotificationCalendar(
                 second: 0, minute: 51, hour: 9, repeats: true));
-        writer.writeGoal(goal);
+            FileIO writer = FileIO();
+            writer.writeGoal(goal);*/
       }),
     );
   }
@@ -578,8 +593,8 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
       if (appState.editingMode) {
         changeGoal();
       } else {
-        gc.GoalClass goal = gc.GoalClass(begin, end, percent!, goalName);
-        appState.goalList.add(goal);
+        gc.GoalClass goal = gc.GoalClass(begin, end, percent!, goalName, "");
+        appState.addGoal(goal);
         begin = null;
         end = null;
         goalName = null;
@@ -727,10 +742,7 @@ class _GoalEditPageState extends State<GoalEditPage> {
       )) {
         case 0:
           setState(() {
-            FileIO deleter = FileIO();
-
-            deleter.delete(appState.currGoal);
-            appState.goalList.remove(appState.currGoal);
+            appState.removeGoal(appState.currGoal);
           });
           Navigator.pop(context);
           appState.currGoal = null;

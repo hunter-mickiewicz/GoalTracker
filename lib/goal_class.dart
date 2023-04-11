@@ -2,6 +2,8 @@
 class GoalClass {
   DateTime? begin;
   DateTime? end;
+  //current idea, "hour,interval", the hour, then the interval between
+  late String notification;
   double percent = 0;
   String? name;
   String? fileName;
@@ -59,11 +61,12 @@ class GoalClass {
   }
 
   GoalClass(DateTime? beginDate, DateTime? endDate, double startPercent,
-      String? goalName) {
+      String? goalName, String notif) {
     begin = beginDate;
     end = endDate;
     name = goalName;
     percent = updatePercentage(startPercent);
+    notification = notif;
   }
 
   Map<String, dynamic> toJson() => {
@@ -72,6 +75,7 @@ class GoalClass {
         'begin': dataDate(begin!),
         'end': dataDate(end!),
         'milestones': milestones,
+        'notification': notification,
       };
 
   GoalClass.fromJson(Map<String, dynamic> json)
@@ -79,7 +83,8 @@ class GoalClass {
         percent = json['percent'],
         begin = json['begin'],
         end = json['end'],
-        milestones = json['milestones'];
+        milestones = json['milestones'],
+        notification = json['notification'];
 
   String print() {
     return """
@@ -87,7 +92,8 @@ class GoalClass {
       percent: $percent,
       begin: ${dataDate(begin!)},
       end: ${dataDate(end!)},
-      milestones: $milestones
+      milestones: $milestones,
+      notification: $notification
     """;
   }
 }

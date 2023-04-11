@@ -8,7 +8,7 @@ import 'package:test/test.dart';
 
 main() {
   group('Goal Class', () {
-    var goal = GoalClass(DateTime(2022), DateTime(2023), 12.0, "test");
+    var goal = GoalClass(DateTime(2022), DateTime(2023), 12.0, "test", "");
     test('Information should be initialized', () {
       expect(goal.begin, DateTime(2022));
       expect(goal.end, DateTime(2023));

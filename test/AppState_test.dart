@@ -8,7 +8,7 @@ import 'package:goal_tracker/main.dart';
 
 void main() {
   final appState = MyAppState();
-  final goal = GoalClass(DateTime(2022), DateTime(2023), 12, 'test');
+  final goal = GoalClass(DateTime(2022), DateTime(2023), 12, 'test', "");
   //FileIO fileDoodad = FileIO();
   testWidgets('AppState goal list should add item properly', (tester) async {
     await tester.pumpWidget(MaterialApp(
