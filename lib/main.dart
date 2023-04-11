@@ -122,8 +122,7 @@ Future<List<gc.GoalClass>?> readAddGoals() async {
       var decoded = json.decode(settingsString);
 
       settings = Settings.json(decoded);
-
-      //further logic for settings...
+      settings?.notificationPreference = false;
     } else if (file.toString().contains(".txt")) {
       readInGoal(File(file.path));
     }
@@ -334,7 +333,9 @@ class _SettingsPageState extends State<SettingsPage> {
 
     switch (setting) {
       case 0:
-        settings!.recurringTime = val;
+        val == 0
+            ? settings!.notificationPreference = false
+            : settings!.notificationPreference = true;
         setState(() {
           writer.writeSettings(settings!);
         });
@@ -343,6 +344,8 @@ class _SettingsPageState extends State<SettingsPage> {
         throw UnimplementedError();
     }
   }
+
+  List<String> notifPref = ["Single", "Per Goal"];
 
   @override
   Widget build(BuildContext context) {
@@ -359,26 +362,43 @@ class _SettingsPageState extends State<SettingsPage> {
         body: ListView(
       children: [
         ListTile(
-          title: Text("Notification Rate"),
-          subtitle: Text("${settings!.getRecurringTime() * 5} Seconds"),
+          title: Text("Notification Preference"),
+          subtitle: Text(settings!.getNotifPref()),
           onTap: () async {
             showDialog(
                 context: context,
                 builder: (BuildContext context) => Dialog(
-                        child: TextField(
-                      keyboardType: TextInputType.number,
-                      textAlign: TextAlign.center,
-                      decoration: InputDecoration(
-                          border: InputBorder.none,
-                          labelText: "Number of hours between notifications",
-                          floatingLabelAlignment:
-                              FloatingLabelAlignment.center),
-                      onSubmitted: (value) {
-                        //TODO: need error checking here
-                        //AwesomeNotifications().createNotification(content: NotificationContent(id: id, channelKey: channelKey), schedule: NotificationInterval(interval: ))
-                        updateSettings(0, int.parse(value));
-                      },
-                    )));
+                        child: ListView(shrinkWrap: true, children: <Widget>[
+                      ListTile(
+                        title: Text(notifPref[0]),
+                        onTap: () {
+                          updateSettings(0, 0);
+                          Navigator.pop(context);
+                        },
+                      ),
+                      ListTile(
+                        title: Text(notifPref[1]),
+                        onTap: () {
+                          updateSettings(0, 1);
+                          Navigator.pop(context);
+                          showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (BuildContext context) => AlertDialog(
+                                    title: Text("Alert"),
+                                    content: Text(
+                                        "With this setting, there will be one notification per goal. Make sure to update your goals with a notification day/time."),
+                                    actions: <Widget>[
+                                      TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: Text("Confirm"))
+                                    ],
+                                  ));
+                        },
+                      ),
+                    ])));
           },
         ),
         Divider(),
