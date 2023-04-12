@@ -535,6 +535,18 @@ class GoalCreatorPage extends StatefulWidget {
 
 class _GoalCreatorPageState extends State<GoalCreatorPage> {
   String? goalName;
+  String? notifDays;
+  List<String> weekDays = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday"
+  ];
+  List<bool> daysSelected = List<bool>.generate(7, (int index) => false);
+  String notificationDays = "Select Days";
   TimeOfDay? notifTime;
   String notificationTime = "Select Time";
   DateTime? begin;
@@ -585,6 +597,31 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
         notificationTime = tempTime.substring(
             tempTime.indexOf("(") + 1, tempTime.indexOf(")"));
       }
+    });
+  }
+
+  Future<void> _selectNotifDays() async {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) => Dialog(
+                child: DataTable(
+              columns: <DataColumn>[DataColumn(label: Text("Day"))],
+              rows: List<DataRow>.generate(
+                  weekDays.length,
+                  (index) => DataRow(
+                      cells: <DataCell>[DataCell(Text(weekDays[index]))],
+                      selected: daysSelected[index],
+                      onSelectChanged: (bool? value) {
+                        setState(() {
+                          checkmarkDays(index, value);
+                        });
+                      })),
+            )));
+  }
+
+  Future<void> checkmarkDays(index, val) async {
+    setState(() {
+      daysSelected[index] = val;
     });
   }
 
@@ -695,6 +732,13 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
                 });
               },
               child: Text(notificationTime)),
+          Text("What days do you want the notification to repeat?"),
+          OutlinedButton(
+              onPressed: () {
+                _selectNotifDays();
+                checkReady();
+              },
+              child: Text("Select Days")),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
