@@ -5,6 +5,7 @@ import 'dart:convert';
 // ignore: unused_import
 import 'dart:developer';
 import 'dart:io';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:goal_tracker/settings.dart';
 
 import 'package:path_provider/path_provider.dart';
@@ -534,6 +535,8 @@ class GoalCreatorPage extends StatefulWidget {
 
 class _GoalCreatorPageState extends State<GoalCreatorPage> {
   String? goalName;
+  TimeOfDay? notifTime;
+  String notificationTime = "Select Time";
   DateTime? begin;
   String beginString = "Start Date";
   DateTime? end;
@@ -573,6 +576,18 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
     });
   }
 
+  Future<void> _getNotifTime() async {
+    notifTime =
+        await showTimePicker(context: context, initialTime: TimeOfDay.now());
+    setState(() {
+      if (notifTime != null) {
+        String tempTime = notifTime.toString();
+        notificationTime = tempTime.substring(
+            tempTime.indexOf("(") + 1, tempTime.indexOf(")"));
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext ctx) {
     var appState = ctx.watch<MyAppState>();
@@ -607,7 +622,8 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
           (begin != null &&
               end != null &&
               goalName != null &&
-              percent != null)) {
+              percent != null &&
+              notifTime != null)) {
         confirmReady = true;
       } else {
         confirmReady = false;
@@ -670,6 +686,15 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
               });
             },
           ),
+          Text("What time do you want the reminder notification?"),
+          OutlinedButton(
+              onPressed: () {
+                setState(() {
+                  _getNotifTime();
+                  checkReady();
+                });
+              },
+              child: Text(notificationTime)),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
