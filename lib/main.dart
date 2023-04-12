@@ -613,16 +613,10 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
                       selected: daysSelected[index],
                       onSelectChanged: (bool? value) {
                         setState(() {
-                          checkmarkDays(index, value);
+                          daysSelected[index] = value!;
                         });
                       })),
             )));
-  }
-
-  Future<void> checkmarkDays(index, val) async {
-    setState(() {
-      daysSelected[index] = val;
-    });
   }
 
   @override
