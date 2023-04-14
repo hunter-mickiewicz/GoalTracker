@@ -535,7 +535,6 @@ class GoalCreatorPage extends StatefulWidget {
 
 class _GoalCreatorPageState extends State<GoalCreatorPage> {
   String? goalName;
-  String? notifDays;
   List<String> weekDays = [
     "Monday",
     "Tuesday",
@@ -600,28 +599,28 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
     });
   }
 
-  Future<void> _selectNotifDays() async {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) => Dialog(
-                child: DataTable(
-              columns: <DataColumn>[DataColumn(label: Text("Day"))],
-              rows: List<DataRow>.generate(
-                  weekDays.length,
-                  (index) => DataRow(
-                      cells: <DataCell>[DataCell(Text(weekDays[index]))],
-                      selected: daysSelected[index],
-                      onSelectChanged: (bool? value) {
-                        setState(() {
-                          daysSelected[index] = value!;
-                        });
-                      })),
-            )));
-  }
-
   @override
   Widget build(BuildContext ctx) {
     var appState = ctx.watch<MyAppState>();
+
+    Future<void> _selectNotifDays() async {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) => Dialog(
+                  child: DataTable(
+                columns: <DataColumn>[DataColumn(label: Text("Day"))],
+                rows: List<DataRow>.generate(
+                    weekDays.length,
+                    (int index) => DataRow(
+                        cells: <DataCell>[DataCell(Text(weekDays[index]))],
+                        selected: daysSelected[index],
+                        onSelectChanged: (bool? value) {
+                          setState(() {
+                            daysSelected[index] = value!;
+                          });
+                        })),
+              )));
+    }
 
     void changeGoal() {
       begin != null ? begin = begin : begin = appState.currGoal.begin;
@@ -728,8 +727,15 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
               child: Text(notificationTime)),
           Text("What days do you want the notification to repeat?"),
           OutlinedButton(
-              onPressed: () {
-                _selectNotifDays();
+              onPressed: () async {
+                setState(() {
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) => NotifDay(
+                            weekDays: weekDays,
+                            selectedDays: daysSelected,
+                          ));
+                });
                 checkReady();
               },
               child: Text("Select Days")),
@@ -757,6 +763,39 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
         ],
       ),
     );
+  }
+}
+
+class NotifDay extends StatefulWidget {
+  const NotifDay(
+      {super.key, required this.weekDays, required this.selectedDays});
+
+  final List<bool> selectedDays;
+  final List<String> weekDays;
+
+  @override
+  _NotifDayState createState() => _NotifDayState();
+}
+
+class _NotifDayState extends State<NotifDay> {
+  _NotifDayState();
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+        child: DataTable(
+      columns: <DataColumn>[DataColumn(label: Text("Day"))],
+      rows: List<DataRow>.generate(
+          widget.weekDays.length,
+          (int index) => DataRow(
+              cells: <DataCell>[DataCell(Text(widget.weekDays[index]))],
+              selected: widget.selectedDays[index],
+              onSelectChanged: (bool? value) {
+                setState(() {
+                  widget.selectedDays[index] = value!;
+                });
+              })),
+    ));
   }
 }
 
