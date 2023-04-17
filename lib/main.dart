@@ -548,6 +548,8 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
   List<bool> daysSelected = List<bool>.generate(7, (int index) => false);
   TimeOfDay? notifTime;
   String notificationTime = "Select Time";
+  String? notifDays;
+  String daysText = "Select Day";
   DateTime? begin;
   String beginString = "Start Date";
   DateTime? end;
@@ -587,6 +589,29 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
     });
   }
 
+  Future<void> _getNotifDay() async {
+    await showDialog(
+        context: context,
+        builder: (BuildContext context) => NotifDay(
+              weekDays: weekDays,
+              selectedDays: daysSelected,
+            ));
+    log(daysSelected.toString());
+    if (daysSelected.contains(true)) {
+      String tempDays = "";
+      for (int i = 0; i < daysSelected.length; i++) {
+        if (daysSelected[i]) {
+          tempDays += "${weekDays[i]}, ";
+        }
+      }
+      tempDays = tempDays.substring(0, tempDays.length - 2);
+      setState(() {
+        daysText = tempDays;
+      });
+    }
+    ;
+  }
+
   Future<void> _getNotifTime() async {
     notifTime =
         await showTimePicker(context: context, initialTime: TimeOfDay.now());
@@ -596,6 +621,7 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
         notificationTime = tempTime.substring(
             tempTime.indexOf("(") + 1, tempTime.indexOf(")"));
       }
+      log(notificationTime);
     });
   }
 
@@ -711,16 +737,12 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
           OutlinedButton(
               onPressed: () {
                 setState(() {
-                  showDialog(
-                      context: context,
-                      builder: (BuildContext context) => NotifDay(
-                            weekDays: weekDays,
-                            selectedDays: daysSelected,
-                          ));
+                  _getNotifDay();
                 });
+                //log(daysSelected.toString());
                 checkReady();
               },
-              child: Text("Select Days")),
+              child: Text(daysText)),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

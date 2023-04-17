@@ -3,6 +3,8 @@ class GoalClass {
   DateTime? begin;
   DateTime? end;
   //current idea, "hour,interval", the hour, then the interval between
+  late String notificationHour;
+  late String notificationDays;
   late String notification;
   double percent = 0;
   String? name;
