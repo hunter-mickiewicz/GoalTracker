@@ -95,6 +95,7 @@ var goalList = <gc.GoalClass>[];
 //There will be one Settings object per app.
 Settings? settings;
 bool firstTimeFlag = false;
+String globalNotifDays = "Select Days";
 
 Future<List<gc.GoalClass>?> readAddGoals() async {
   FileIO reader = FileIO();
@@ -545,7 +546,6 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
     "Sunday"
   ];
   List<bool> daysSelected = List<bool>.generate(7, (int index) => false);
-  String notificationDays = "Select Days";
   TimeOfDay? notifTime;
   String notificationTime = "Select Time";
   DateTime? begin;
@@ -603,25 +603,6 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
   Widget build(BuildContext ctx) {
     var appState = ctx.watch<MyAppState>();
 
-    Future<void> _selectNotifDays() async {
-      showDialog(
-          context: context,
-          builder: (BuildContext context) => Dialog(
-                  child: DataTable(
-                columns: <DataColumn>[DataColumn(label: Text("Day"))],
-                rows: List<DataRow>.generate(
-                    weekDays.length,
-                    (int index) => DataRow(
-                        cells: <DataCell>[DataCell(Text(weekDays[index]))],
-                        selected: daysSelected[index],
-                        onSelectChanged: (bool? value) {
-                          setState(() {
-                            daysSelected[index] = value!;
-                          });
-                        })),
-              )));
-    }
-
     void changeGoal() {
       begin != null ? begin = begin : begin = appState.currGoal.begin;
       end != null ? end = end : end = appState.currGoal.end;
@@ -653,7 +634,8 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
               end != null &&
               goalName != null &&
               percent != null &&
-              notifTime != null)) {
+              notifTime != null &&
+              daysSelected.contains(true))) {
         confirmReady = true;
       } else {
         confirmReady = false;
@@ -727,7 +709,7 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
               child: Text(notificationTime)),
           Text("What days do you want the notification to repeat?"),
           OutlinedButton(
-              onPressed: () async {
+              onPressed: () {
                 setState(() {
                   showDialog(
                       context: context,
@@ -754,6 +736,7 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
                     ? () {
                         appState.editingMode ? changeGoal() : addGoal();
                         Navigator.pop(context);
+                        globalNotifDays = "Select Days";
                       }
                     : null,
                 child: Text("Submit"),
@@ -779,6 +762,15 @@ class NotifDay extends StatefulWidget {
 
 class _NotifDayState extends State<NotifDay> {
   _NotifDayState();
+  List<String> weekDays = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday"
+  ];
 
   @override
   Widget build(BuildContext context) {
