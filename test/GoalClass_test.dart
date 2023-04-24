@@ -17,11 +17,13 @@ main() {
     });
 
     test('Goal information should be changed', () {
-      goal.editGoal(DateTime(2023), DateTime(2024), 40.0, "update");
+      goal.editGoal(
+          DateTime(2023), DateTime(2024), 40.0, "update", "13:00,tftftft");
       expect(goal.begin, DateTime(2023));
       expect(goal.end, DateTime(2024));
       expect(goal.percent, 0.40);
       expect(goal.name, "update");
+      expect(goal.notification, "13:00,tftftft");
     });
 
     test('Usable date should be properly formatted', () {

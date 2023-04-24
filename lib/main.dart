@@ -110,6 +110,7 @@ Future<List<gc.GoalClass>?> readAddGoals() async {
       String end = jsonGoal["end"].toString().replaceAll(".", "-");
       goalList.add(gc.GoalClass(DateTime.parse(begin), DateTime.parse(end),
           jsonGoal["percent"], jsonGoal["name"], jsonGoal['notification']));
+      log(goalList.last.notification);
     } else {
       file.delete();
     }
@@ -546,10 +547,12 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
     "Sunday"
   ];
   List<bool> daysSelected = List<bool>.generate(7, (int index) => false);
+  String? writeNotifTime;
   TimeOfDay? notifTime;
   String notificationTime = "Select Time";
   String? notifDays;
   String daysText = "Select Day";
+  String? daysToText;
   DateTime? begin;
   String beginString = "Start Date";
   DateTime? end;
@@ -599,14 +602,20 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
     log(daysSelected.toString());
     if (daysSelected.contains(true)) {
       String tempDays = "";
+      String tempBools = "";
       for (int i = 0; i < daysSelected.length; i++) {
         if (daysSelected[i]) {
           tempDays += "${weekDays[i]}, ";
+          tempBools += "t";
+        } else {
+          tempBools += "f";
         }
       }
       tempDays = tempDays.substring(0, tempDays.length - 2);
+      log(tempBools.toString());
       setState(() {
         daysText = tempDays;
+        daysToText = tempBools;
       });
     }
     ;
@@ -638,14 +647,16 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
       goalName != null
           ? goalName = goalName
           : goalName = appState.currGoal.name;
-      appState.currGoal.editGoal(begin, end, percent, goalName);
+      appState.currGoal
+          .editGoal(begin, end, percent, goalName, writeNotifTime!);
     }
 
     void addGoal() {
       if (appState.editingMode) {
         changeGoal();
       } else {
-        gc.GoalClass goal = gc.GoalClass(begin, end, percent!, goalName, "");
+        gc.GoalClass goal =
+            gc.GoalClass(begin, end, percent!, goalName, writeNotifTime!);
         appState.addGoal(goal);
         begin = null;
         end = null;
@@ -663,6 +674,8 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
               notifTime != null &&
               daysSelected.contains(true))) {
         confirmReady = true;
+        writeNotifTime = "$notificationTime,$daysToText";
+        log(writeNotifTime!);
       } else {
         confirmReady = false;
       }
@@ -739,7 +752,6 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
                 setState(() {
                   _getNotifDay();
                 });
-                //log(daysSelected.toString());
                 checkReady();
               },
               child: Text(daysText)),

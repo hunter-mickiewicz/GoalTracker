@@ -3,8 +3,6 @@ class GoalClass {
   DateTime? begin;
   DateTime? end;
   //current idea, "hour,interval", the hour, then the interval between
-  late String notificationHour;
-  late String notificationDays;
   late String notification;
   double percent = 0;
   String? name;
@@ -34,11 +32,13 @@ class GoalClass {
     return (name.substring(0, endIndex) + dataDate(date));
   }
 
-  void editGoal(DateTime? st, DateTime? fn, double perc, String? nm) {
+  void editGoal(
+      DateTime? st, DateTime? fn, double perc, String? nm, String? notif) {
     begin = st;
     end = fn;
     percent = updatePercentage(perc);
     name = nm;
+    notification = notif!;
   }
 
   double updatePercentage(double perc) {
