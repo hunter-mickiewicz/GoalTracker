@@ -322,19 +322,6 @@ class _HomePageState extends State<HomePage> {
           context,
           MaterialPageRoute(builder: (context) => GoalCreatorPage()),
         );
-
-        //TEST schedule, add goal
-        /*AwesomeNotifications().createNotification(
-            content: NotificationContent(
-                id: 10,
-                channelKey: 'basic_channel',
-                title: 'Simple Notification',
-                body: 'Simple body',
-                actionType: ActionType.Default),
-            schedule: NotificationCalendar(
-                second: 0, minute: 51, hour: 9, repeats: true));
-            FileIO writer = FileIO();
-            writer.writeGoal(goal);*/
       }),
     );
   }
@@ -592,6 +579,16 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
     });
   }
 
+  String boolsToDay(String bools) {
+    String days = "";
+    for (int i = 0; i < bools.length; i++) {
+      if (bools[i] == "t") {
+        days += "${weekDays[i]}, ";
+      }
+    }
+    return days.substring(0, days.length - 2);
+  }
+
   Future<void> _getNotifDay() async {
     await showDialog(
         context: context,
@@ -688,8 +685,9 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
       body: Column(
         children: [
           Text("Goal Name"),
-          TextField(
-            controller: nameCont,
+          TextFormField(
+            initialValue:
+                appState.editingMode ? appState.currGoal.name : "Goal Name",
             decoration: InputDecoration(
                 focusColor: Color.fromARGB(255, 100, 98, 98),
                 border: OutlineInputBorder(),
@@ -710,7 +708,9 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
                   checkReady();
                 });
               },
-              child: Text(beginString),
+              child: Text(appState.editingMode
+                  ? appState.currGoal.usableDate(appState.currGoal.begin)
+                  : beginString),
             ),
             OutlinedButton(
                 onPressed: () {
@@ -719,13 +719,18 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
                     checkReady();
                   });
                 },
-                child: Text(endString)),
+                child: Text(appState.editingMode
+                    ? appState.currGoal.usableDate(appState.currGoal.end)
+                    : endString)),
           ]),
 
           Text("Enter your percentage to completion"),
           //error on any kind of text input here...
-          TextField(
-            controller: percCont,
+          TextFormField(
+            initialValue: appState.editingMode
+                ? appState.currGoal.getStringPercent()
+                : "Goal Percentage",
+            //controller: percCont,
             decoration: InputDecoration(
                 focusColor: Color.fromARGB(255, 100, 98, 98),
                 border: OutlineInputBorder(),
@@ -745,7 +750,9 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
                   checkReady();
                 });
               },
-              child: Text(notificationTime)),
+              child: Text(appState.editingMode
+                  ? appState.currGoal.notification.toString().substring(0, 5)
+                  : notificationTime)),
           Text("What days do you want the notification to repeat?"),
           OutlinedButton(
               onPressed: () {
@@ -754,7 +761,10 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
                 });
                 checkReady();
               },
-              child: Text(daysText)),
+              child: Text(appState.editingMode
+                  ? boolsToDay(
+                      appState.currGoal.notification.toString().substring(5))
+                  : daysText)),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
