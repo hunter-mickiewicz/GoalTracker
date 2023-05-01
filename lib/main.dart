@@ -215,6 +215,14 @@ class MyAppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void editGoal(gc.GoalClass goal) {
+    FileIO writer = FileIO();
+
+    writer.writeGoal(goal);
+
+    notifyListeners();
+  }
+
   void removeGoal(gc.GoalClass goal) {
     FileIO deleter = FileIO();
     deleter.delete(currGoal);
@@ -636,7 +644,7 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
     var appState = ctx.watch<MyAppState>();
 
     void changeGoal() {
-      FileIO writer = new FileIO();
+      FileIO writer = FileIO();
 
       writer.delete(appState.currGoal);
 
@@ -648,10 +656,11 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
       goalName != null
           ? goalName = goalName
           : goalName = appState.currGoal.name;
-      appState.currGoal
-          .editGoal(begin, end, percent, goalName, writeNotifTime!);
+
       setState(() {
-        writer.writeGoal(appState.currGoal);
+        appState.currGoal
+            .editGoal(begin, end, percent, goalName, writeNotifTime!);
+        appState.editGoal(appState.currGoal);
       });
     }
 
@@ -693,8 +702,7 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
         children: [
           Text("Goal Name"),
           TextFormField(
-            initialValue:
-                appState.editingMode ? appState.currGoal.name : "Goal Name",
+            initialValue: appState.editingMode ? appState.currGoal.name : "",
             decoration: InputDecoration(
                 focusColor: Color.fromARGB(255, 100, 98, 98),
                 border: OutlineInputBorder(),
@@ -736,7 +744,7 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
           TextFormField(
             initialValue: appState.editingMode
                 ? appState.currGoal.getStringPercent()
-                : "Goal Percentage",
+                : "",
             //controller: percCont,
             decoration: InputDecoration(
                 focusColor: Color.fromARGB(255, 100, 98, 98),
