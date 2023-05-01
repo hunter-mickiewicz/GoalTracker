@@ -636,6 +636,10 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
     var appState = ctx.watch<MyAppState>();
 
     void changeGoal() {
+      FileIO writer = new FileIO();
+
+      writer.delete(appState.currGoal);
+
       begin != null ? begin = begin : begin = appState.currGoal.begin;
       end != null ? end = end : end = appState.currGoal.end;
       percent != null
@@ -646,6 +650,9 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
           : goalName = appState.currGoal.name;
       appState.currGoal
           .editGoal(begin, end, percent, goalName, writeNotifTime!);
+      setState(() {
+        writer.writeGoal(appState.currGoal);
+      });
     }
 
     void addGoal() {
