@@ -185,6 +185,33 @@ class MyAppState extends ChangeNotifier {
   // ignore: prefer_typing_uninitialized_variables
   var currGoal;
   bool editingMode = false;
+  int notifId = 0;
+
+  void flushNotifications() {
+    AwesomeNotifications().cancelAll();
+
+    for (int i = 0; i < goalList.length; i++) {
+      for (int j = 0; j < goalList[i].getDays().length; j++) {
+        if (goalList[i].getDays()[j] == 't') {
+          var time = goalList[i].getTime();
+          AwesomeNotifications().createNotification(
+              content: NotificationContent(
+                  id: notifId,
+                  channelKey: 'basic_channel',
+                  title: "Time to update!",
+                  body: "Just a reminder to update ${goalList[i].name}!"),
+              schedule: NotificationCalendar(
+                  timeZone: localTimeZone,
+                  weekday: j + 1,
+                  hour: int.tryParse(time.substring(0, 2)),
+                  minute: int.tryParse(time.substring(3, 5)),
+                  second: 0,
+                  repeats: true));
+          notifId += 1;
+        }
+      }
+    }
+  }
 
   var appBarIndex = 0;
   var pageIndex = 0;
@@ -690,6 +717,7 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
         appState.currGoal
             .editGoal(begin, end, percent, goalName, writeNotifTime!);
         appState.editGoal(appState.currGoal);
+        appState.flushNotifications();
       });
     }
 
@@ -704,6 +732,7 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
         end = null;
         goalName = null;
         percent = null;
+        appState.flushNotifications();
       }
     }
 
@@ -917,6 +946,7 @@ class _GoalEditPageState extends State<GoalEditPage> {
         case 0:
           setState(() {
             appState.removeGoal(appState.currGoal);
+            appState.flushNotifications();
           });
           Navigator.pop(context);
           appState.currGoal = null;

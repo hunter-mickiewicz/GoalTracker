@@ -9,6 +9,14 @@ class GoalClass {
   String? fileName;
   var milestones = <String, List<String>>{};
 
+  String getDays() {
+    return notification.substring(6);
+  }
+
+  String getTime() {
+    return notification.substring(0, 5);
+  }
+
   String getStringPercent() {
     return (percent * 100).toString();
   }
