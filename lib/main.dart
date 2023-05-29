@@ -656,6 +656,18 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
           ? goalName = goalName
           : goalName = appState.currGoal.name;
 
+      //notification logic
+      notificationTime != "Select Time"
+          ? notificationTime = notificationTime
+          : notificationTime = appState.currGoal.notification.substring(0, 5);
+
+      daysToText != null
+          ? daysToText = daysToText
+          : daysToText = appState.currGoal.notification.substring(6);
+
+      writeNotifTime = "$notificationTime,$daysToText";
+      log(writeNotifTime!);
+
       setState(() {
         writer.delete(appState.currGoal);
         appState.editingMode = false;
@@ -725,7 +737,9 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
                 });
               },
               child: Text(appState.editingMode
-                  ? appState.currGoal.usableDate(appState.currGoal.begin)
+                  ? (beginString == "Start Date"
+                      ? appState.currGoal.usableDate(appState.currGoal.begin)
+                      : beginString)
                   : beginString),
             ),
             OutlinedButton(
@@ -736,7 +750,9 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
                   });
                 },
                 child: Text(appState.editingMode
-                    ? appState.currGoal.usableDate(appState.currGoal.end)
+                    ? (endString == "End Date"
+                        ? appState.currGoal.usableDate(appState.currGoal.end)
+                        : endString)
                     : endString)),
           ]),
 
@@ -767,7 +783,11 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
                 });
               },
               child: Text(appState.editingMode
-                  ? appState.currGoal.notification.toString().substring(0, 5)
+                  ? (notificationTime == "Select Time"
+                      ? appState.currGoal.notification
+                          .toString()
+                          .substring(0, 5)
+                      : notificationTime)
                   : notificationTime)),
           Text("What days do you want the notification to repeat?"),
           OutlinedButton(
@@ -778,8 +798,11 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
                 checkReady();
               },
               child: Text(appState.editingMode
-                  ? boolsToDay(
-                      appState.currGoal.notification.toString().substring(6))
+                  ? (daysText == "Select Day"
+                      ? boolsToDay(appState.currGoal.notification
+                          .toString()
+                          .substring(6))
+                      : daysText)
                   : daysText)),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
