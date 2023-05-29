@@ -5,14 +5,12 @@ import 'dart:convert';
 // ignore: unused_import
 import 'dart:developer';
 import 'dart:io';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:goal_tracker/settings.dart';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:percent_indicator/percent_indicator.dart' as perc;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:timezone/timezone.dart';
 import 'file_io.dart';
 import 'goal_class.dart' as gc;
 import 'package:awesome_notifications/awesome_notifications.dart';
@@ -575,9 +573,6 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
     var appState = ctx.watch<MyAppState>();
 
     void checkReady() {
-      String logString = "";
-      writeNotifTime == null ? logString = "Null" : logString = writeNotifTime!;
-      log("Logging... $logString");
       if (appState.editingMode ||
           (begin != null &&
               end != null &&
@@ -593,7 +588,7 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
       }
     }
 
-    Future<void> _getNotifDay() async {
+    Future<void> getNotifDay() async {
       await showDialog(
           context: context,
           builder: (BuildContext context) => NotifDay(
@@ -622,7 +617,7 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
       }
     }
 
-    Future<void> _getNotifTime() async {
+    Future<void> getNotifTime() async {
       notifTime =
           await showTimePicker(context: context, initialTime: TimeOfDay.now());
       setState(() {
@@ -635,7 +630,7 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
       });
     }
 
-    Future<void> _beginDateSelection() async {
+    Future<void> beginDateSelection() async {
       begin = await showDatePicker(
           context: context,
           initialDate: DateTime.now(),
@@ -650,7 +645,7 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
       });
     }
 
-    Future<void> _endDateSelection() async {
+    Future<void> endDateSelection() async {
       end = await showDatePicker(
           context: context,
           initialDate: DateTime.now(),
@@ -737,7 +732,7 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
             OutlinedButton(
               onPressed: () {
                 setState(() {
-                  _beginDateSelection();
+                  beginDateSelection();
                 });
               },
               child: Text(appState.editingMode
@@ -749,7 +744,7 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
             OutlinedButton(
                 onPressed: () {
                   setState(() {
-                    _endDateSelection();
+                    endDateSelection();
                   });
                 },
                 child: Text(appState.editingMode
@@ -781,7 +776,7 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
           OutlinedButton(
               onPressed: () {
                 setState(() {
-                  _getNotifTime();
+                  getNotifTime();
                 });
               },
               child: Text(appState.editingMode
@@ -795,7 +790,7 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
           OutlinedButton(
               onPressed: () {
                 setState(() {
-                  _getNotifDay();
+                  getNotifDay();
                 });
               },
               child: Text(appState.editingMode
