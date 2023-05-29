@@ -559,34 +559,6 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
 
   void saveGoal() {}
 
-  Future<void> _beginDateSelection() async {
-    begin = await showDatePicker(
-        context: context,
-        initialDate: DateTime.now(),
-        firstDate: DateTime.now().subtract(const Duration(days: 365)),
-        lastDate: DateTime.now().add(const Duration(days: 365)));
-
-    setState(() {
-      if (begin != null) {
-        beginString = "${begin!.month}/${begin!.day}/${begin!.year}";
-      }
-    });
-  }
-
-  Future<void> _endDateSelection() async {
-    end = await showDatePicker(
-        context: context,
-        initialDate: DateTime.now(),
-        firstDate: DateTime.now().subtract(const Duration(days: 365)),
-        lastDate: DateTime.now().add(const Duration(days: 365)));
-
-    setState(() {
-      if (end != null) {
-        endString = "${end!.month}/${end!.day}/${end!.year}";
-      }
-    });
-  }
-
   String boolsToDay(String bools) {
     String days = "";
     log(bools.toString());
@@ -598,51 +570,100 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
     return days.substring(0, days.length - 2);
   }
 
-  Future<void> _getNotifDay() async {
-    await showDialog(
-        context: context,
-        builder: (BuildContext context) => NotifDay(
-              weekDays: weekDays,
-              selectedDays: daysSelected,
-            ));
-    log(daysSelected.toString());
-    if (daysSelected.contains(true)) {
-      String tempDays = "";
-      String tempBools = "";
-      for (int i = 0; i < daysSelected.length; i++) {
-        if (daysSelected[i]) {
-          tempDays += "${weekDays[i]}, ";
-          tempBools += "t";
-        } else {
-          tempBools += "f";
-        }
-      }
-      tempDays = tempDays.substring(0, tempDays.length - 2);
-      log(tempBools.toString());
-      setState(() {
-        daysText = tempDays;
-        daysToText = tempBools;
-      });
-    }
-    ;
-  }
-
-  Future<void> _getNotifTime() async {
-    notifTime =
-        await showTimePicker(context: context, initialTime: TimeOfDay.now());
-    setState(() {
-      if (notifTime != null) {
-        String tempTime = notifTime.toString();
-        notificationTime = tempTime.substring(
-            tempTime.indexOf("(") + 1, tempTime.indexOf(")"));
-      }
-      log(notificationTime);
-    });
-  }
-
   @override
   Widget build(BuildContext ctx) {
     var appState = ctx.watch<MyAppState>();
+
+    void checkReady() {
+      String logString = "";
+      writeNotifTime == null ? logString = "Null" : logString = writeNotifTime!;
+      log("Logging... $logString");
+      if (appState.editingMode ||
+          (begin != null &&
+              end != null &&
+              goalName != null &&
+              percent != null &&
+              notifTime != null &&
+              daysSelected.contains(true))) {
+        confirmReady = true;
+        writeNotifTime = "$notificationTime,$daysToText";
+        log(writeNotifTime!);
+      } else {
+        confirmReady = false;
+      }
+    }
+
+    Future<void> _getNotifDay() async {
+      await showDialog(
+          context: context,
+          builder: (BuildContext context) => NotifDay(
+                weekDays: weekDays,
+                selectedDays: daysSelected,
+              ));
+      log(daysSelected.toString());
+      if (daysSelected.contains(true)) {
+        String tempDays = "";
+        String tempBools = "";
+        for (int i = 0; i < daysSelected.length; i++) {
+          if (daysSelected[i]) {
+            tempDays += "${weekDays[i]}, ";
+            tempBools += "t";
+          } else {
+            tempBools += "f";
+          }
+        }
+        tempDays = tempDays.substring(0, tempDays.length - 2);
+        log(tempBools.toString());
+        setState(() {
+          daysText = tempDays;
+          daysToText = tempBools;
+          checkReady();
+        });
+      }
+    }
+
+    Future<void> _getNotifTime() async {
+      notifTime =
+          await showTimePicker(context: context, initialTime: TimeOfDay.now());
+      setState(() {
+        if (notifTime != null) {
+          String tempTime = notifTime.toString();
+          notificationTime = tempTime.substring(
+              tempTime.indexOf("(") + 1, tempTime.indexOf(")"));
+        }
+        checkReady();
+      });
+    }
+
+    Future<void> _beginDateSelection() async {
+      begin = await showDatePicker(
+          context: context,
+          initialDate: DateTime.now(),
+          firstDate: DateTime.now().subtract(const Duration(days: 365)),
+          lastDate: DateTime.now().add(const Duration(days: 365)));
+
+      setState(() {
+        if (begin != null) {
+          beginString = "${begin!.month}/${begin!.day}/${begin!.year}";
+        }
+        checkReady();
+      });
+    }
+
+    Future<void> _endDateSelection() async {
+      end = await showDatePicker(
+          context: context,
+          initialDate: DateTime.now(),
+          firstDate: DateTime.now().subtract(const Duration(days: 365)),
+          lastDate: DateTime.now().add(const Duration(days: 365)));
+
+      setState(() {
+        if (end != null) {
+          endString = "${end!.month}/${end!.day}/${end!.year}";
+        }
+        checkReady();
+      });
+    }
 
     void changeGoal() {
       FileIO writer = FileIO();
@@ -691,22 +712,6 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
       }
     }
 
-    void checkReady() {
-      if (appState.editingMode ||
-          (begin != null &&
-              end != null &&
-              goalName != null &&
-              percent != null &&
-              notifTime != null &&
-              daysSelected.contains(true))) {
-        confirmReady = true;
-        writeNotifTime = "$notificationTime,$daysToText";
-        log(writeNotifTime!);
-      } else {
-        confirmReady = false;
-      }
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: Text(appState.editingMode ? "Edit Goal" : "New Goal"),
@@ -733,7 +738,6 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
               onPressed: () {
                 setState(() {
                   _beginDateSelection();
-                  checkReady();
                 });
               },
               child: Text(appState.editingMode
@@ -746,7 +750,6 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
                 onPressed: () {
                   setState(() {
                     _endDateSelection();
-                    checkReady();
                   });
                 },
                 child: Text(appState.editingMode
@@ -779,7 +782,6 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
               onPressed: () {
                 setState(() {
                   _getNotifTime();
-                  checkReady();
                 });
               },
               child: Text(appState.editingMode
@@ -795,7 +797,6 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
                 setState(() {
                   _getNotifDay();
                 });
-                checkReady();
               },
               child: Text(appState.editingMode
                   ? (daysText == "Select Day"
