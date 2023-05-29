@@ -589,6 +589,7 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
 
   String boolsToDay(String bools) {
     String days = "";
+    log(bools.toString());
     for (int i = 0; i < bools.length; i++) {
       if (bools[i] == "t") {
         days += "${weekDays[i]}, ";
@@ -646,8 +647,6 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
     void changeGoal() {
       FileIO writer = FileIO();
 
-      writer.delete(appState.currGoal);
-
       begin != null ? begin = begin : begin = appState.currGoal.begin;
       end != null ? end = end : end = appState.currGoal.end;
       percent != null
@@ -658,6 +657,8 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
           : goalName = appState.currGoal.name;
 
       setState(() {
+        writer.delete(appState.currGoal);
+        appState.editingMode = false;
         appState.currGoal
             .editGoal(begin, end, percent, goalName, writeNotifTime!);
         appState.editGoal(appState.currGoal);
@@ -778,7 +779,7 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
               },
               child: Text(appState.editingMode
                   ? boolsToDay(
-                      appState.currGoal.notification.toString().substring(5))
+                      appState.currGoal.notification.toString().substring(6))
                   : daysText)),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -786,6 +787,7 @@ class _GoalCreatorPageState extends State<GoalCreatorPage> {
               OutlinedButton(
                   onPressed: () {
                     Navigator.of(context).pop(context);
+                    appState.editingMode = false;
                   },
                   child: Text("Cancel")),
               // ignore: sort_child_properties_last
